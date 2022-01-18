@@ -14,7 +14,7 @@ namespace QuestPatcher
     
     public class UIPrompter : IUserPrompter
     {
-        public const string NOW_VERSION = "2.3.2";
+        public const string NOW_VERSION = "2.3.3";
 
 
 

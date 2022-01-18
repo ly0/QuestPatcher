@@ -47,6 +47,7 @@ namespace QuestPatcher.Core.Patching
         /// </summary>
         private const string TagPermission = "questpatcher.modded";
 
+    
         public ApkInfo? InstalledApp { get => _installedApp; private set { if (_installedApp != value) { _installedApp = value; NotifyPropertyChanged(); } } }
         private ApkInfo? _installedApp;
 

@@ -283,6 +283,15 @@ namespace QuestPatcher.Core
 
             foreach(KeyValuePair<string, string> path in paths)
             {
+                if(path.Value.Contains("com.beatgames.beatsaber/files/mods/")||path.Value.Contains("com.beatgames.beatsaber/files/libs/"))
+                {
+                    _logger.Warning("[ MFix ] Creating mods and libs folder.");
+                    List<string> folders=new();
+                    folders.Add("/sdcard/Android/data/com.beatgames.beatsaber/files/mods/");
+                    folders.Add("/sdcard/Android/data/com.beatgames.beatsaber/files/libs/"); 
+                    await CreateDirectories(folders); ;
+                }    
+
                 commands.Add($"cp '{FixPath(path.Key)}' '{FixPath(path.Value)}'");
             }
 
@@ -318,8 +327,17 @@ namespace QuestPatcher.Core
             {
                 commands.Add($"rm '{FixPath(path)}'");
             }
-
-            await RunShellCommands(commands);
+            try
+            {
+                await RunShellCommands(commands);
+            }catch(Exception ex)
+            {
+                if(ex.ToString().Contains("BeatTogether.cfg"))
+                {
+                    _logger.Warning("[ MFix ] Threw error about BeatTogether.cfg.Handled.");
+                }
+                else throw ex;
+            }
         }
 
         public async Task ExtractArchive(string path, string outputFolder)
