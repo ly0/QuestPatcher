@@ -110,7 +110,7 @@ namespace QuestPatcher.ViewModels
                 DialogBuilder builder = new()
                 {
                     Title = "你确定吗？",
-                    Text = "卸载你的应用会导致本软件退出。如果你今后又重新安装了你的应用，重新开启本软件 你就可以重新打补丁了"
+                    Text = "游戏卸载完成后本软件将自动退出。如果你今后又安装了回来，重新打开本软件就可以再次打补丁"
                 };
                 builder.OkButton.Text = "好的，卸载";
                 builder.CancelButton.Text = "算了，我再想想";

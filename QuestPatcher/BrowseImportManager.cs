@@ -388,11 +388,11 @@ namespace QuestPatcher
             {
                 DialogBuilder builder = new()
                 {
-                    Title = "Outdated Mod",
-                    Text = $"The mod just installed is for version {mod.PackageVersion} of your app, however you have {_patchingManager.InstalledApp.Version}. Enabling the mod may crash the game, or not work."
+                    Title = "版本不匹配的Mod",
+                    Text = $"该Mod是为{mod.PackageVersion}版本的游戏开发的，然而你当前安装的游戏版本是{_patchingManager.InstalledApp.Version}。启用这个Mod可能会导致游戏崩溃，也可能不管用。"
                 };
-                builder.OkButton.Text = "Enable Now";
-                builder.CancelButton.Text = "Cancel";
+                builder.OkButton.Text = "立即启用";
+                builder.CancelButton.Text = "取消";
 
                 if(!await builder.OpenDialogue(_mainWindow))
                 {
