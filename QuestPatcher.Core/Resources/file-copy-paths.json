@@ -40,8 +40,8 @@
     },
     {
       "path": "/sdcard/ModData/com.beatgames.beatsaber/Mods/Qosmetics/notes/",
-      "nameSingular": "自定义Note",
-      "namePlural": "自定义Notes",
+      "nameSingular": "自定义方块",
+      "namePlural": "自定义方块",
       "supportedExtensions": [ "qbloq" ]
     },
     {
