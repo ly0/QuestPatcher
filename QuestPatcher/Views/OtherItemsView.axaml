@@ -51,7 +51,7 @@
               <DataTemplate>
                 <Panel>
                   <TextBlock HorizontalAlignment="Left" VerticalAlignment="Center" Text="{Binding ., Converter={StaticResource FileNameConverter}}" />
-                  <Button HorizontalAlignment="Right" VerticalAlignment="Center" Click="FileDeleteBtn_Click">Delete</Button>
+                  <Button HorizontalAlignment="Right" VerticalAlignment="Center" Click="FileDeleteBtn_Click">删除</Button>
                 </Panel>
               </DataTemplate>
             </ListBox.ItemTemplate>
