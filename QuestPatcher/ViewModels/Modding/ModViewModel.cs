@@ -121,7 +121,7 @@ namespace QuestPatcher.ViewModels.Modding
                     Title = "版本不匹配的Mod",
                     Text = $"该Mod是为{Mod.PackageVersion}版本的游戏开发的，然而你当前安装的游戏版本是{_patchingManager.InstalledApp.Version}。启用这个Mod有可能会导致游戏崩溃，也有可能正常运行。"
                 };
-                builder.OkButton.Text = "Continue Anyway";
+                builder.OkButton.Text = "仍然继续";
 
                 if(!await builder.OpenDialogue(_mainWindow))
                 {
