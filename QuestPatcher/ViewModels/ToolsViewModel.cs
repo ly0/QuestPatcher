@@ -64,16 +64,17 @@ namespace QuestPatcher.ViewModels
             {
                 DialogBuilder builder = new()
                 {
-                    Title = "Are you sure?",
-                    Text = "Uninstalling your app will exit QuestPatcher, as it requires your app to be installed. If you ever reinstall your app, reopen QuestPatcher and you can repatch"
+                    Title = "你确定吗？",
+                    Text = "卸载你的应用会导致本软件退出。如果你今后又重新安装了你的应用，重新开启本软件 你就可以重新打补丁了"
                 };
-                builder.OkButton.Text = "Uninstall App";
+                builder.OkButton.Text = "好的，卸载";
+                builder.CancelButton.Text = "算了，我再想想";
                 if (await builder.OpenDialogue(_mainWindow))
                 {
                     Locker.StartOperation();
                     try
                     {
-                        _logger.Information("Uninstalling app . . .");
+                        _logger.Information("正在卸载 . . .");
                         await _patchingManager.UninstallCurrentApp();
                     }
                     finally
@@ -84,7 +85,7 @@ namespace QuestPatcher.ViewModels
             }
             catch (Exception ex)
             {
-                _logger.Error($"Failed to uninstall app: {ex}");
+                _logger.Error($"卸载 {ex} 失败！");
             }
         }
 

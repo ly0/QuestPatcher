@@ -16,8 +16,8 @@ namespace QuestPatcher.ViewModels.Modding
         public ManageModsViewModel(ModManager modManager, PatchingManager patchingManager, Window mainWindow, OperationLocker locker, ProgressViewModel progressView, BrowseImportManager browseManager)
         {
             ProgressView = progressView;
-            ModsList = new ModListViewModel("Mods", true, modManager.Mods, modManager, patchingManager, mainWindow, locker, browseManager);
-            LibrariesList = new ModListViewModel("Libraries", false, modManager.Libraries, modManager, patchingManager, mainWindow, locker, browseManager);
+            ModsList = new ModListViewModel("模组", true, modManager.Mods, modManager, patchingManager, mainWindow, locker, browseManager);
+            LibrariesList = new ModListViewModel("支持库", false, modManager.Libraries, modManager, patchingManager, mainWindow, locker, browseManager);
         }
     }
 }

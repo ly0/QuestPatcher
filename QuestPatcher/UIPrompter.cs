@@ -34,8 +34,8 @@ namespace QuestPatcher
 
             DialogBuilder builder = new()
             {
-                Title = "App Not Installed",
-                Text = $"The selected app - {_config.AppId} - is not installed",
+                Title = "应用未安装",
+                Text = $"所选择的APP - {_config.AppId} - 没有在你的Quest2上安装",
                 HideOkButton = true
             };
             builder.CancelButton.Text = "Close";

@@ -34,32 +34,32 @@
   "com.beatgames.beatsaber": [
     {
       "path": "/sdcard/ModData/com.beatgames.beatsaber/Mods/Qosmetics/sabers/",
-      "nameSingular": "Custom Saber",
-      "namePlural": "Custom Sabers",
+      "nameSingular": "自定义光剑",
+      "namePlural": "自定义光剑",
       "supportedExtensions": [ "qsaber" ]
     },
     {
       "path": "/sdcard/ModData/com.beatgames.beatsaber/Mods/Qosmetics/notes/",
-      "nameSingular": "Custom Note",
-      "namePlural": "Custom Notes",
+      "nameSingular": "自定义Note",
+      "namePlural": "自定义Notes",
       "supportedExtensions": [ "qbloq" ]
     },
     {
       "path": "/sdcard/ModData/com.beatgames.beatsaber/Mods/Qosmetics/walls/",
-      "nameSingular": "Custom Wall",
-      "namePlural": "Custom Walls",
+      "nameSingular": "自定义墙",
+      "namePlural": "自定义墙",
       "supportedExtensions": [ "qwall" ]
     },
     {
       "path": "/sdcard/ModData/com.beatgames.beatsaber/Mods/CustomPillows/images/",
-      "nameSingular": "Pillow Texture",
-      "namePlural": "Pillow Textures",
+      "nameSingular": "枕头材质",
+      "namePlural": "枕头材质",
       "supportedExtensions": [ "png", "jpg", "jpeg" ]
     },
     {
       "path": "/sdcard/ModData/com.beatgames.beatsaber/Mods/CustomPillows/constellations/",
-      "nameSingular": "Pillow Constellation",
-      "namePlural": "Pillow Constellations",
+      "nameSingular": "枕头形状",
+      "namePlural": "枕头形状",
       "supportedExtensions": [ "json" ]
     }
   ]

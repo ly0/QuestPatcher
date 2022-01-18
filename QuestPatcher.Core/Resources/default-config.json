@@ -1,6 +1,6 @@
 ﻿{
-  "appId": "com.AnotherAxiom.GorillaTag",
-  "showPatchingOptions":  false,
+  "appId": "com.beatgames.beatsaber",
+  "showPatchingOptions": false,
   "patchingPermissions": {
     "externalFiles": true,
     "debuggable": false,

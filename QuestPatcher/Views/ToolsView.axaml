@@ -12,59 +12,55 @@
     <StackPanel DockPanel.Dock="Top">
       <StackPanel Spacing="10">
         <StackPanel Orientation="Horizontal" Spacing="15">
-          <TextBlock FontSize="20">Tools</TextBlock>
-          <TextBlock FontSize="10" VerticalAlignment="Bottom" FontWeight="Light">Useful for troubleshooting issues and managing your install.</TextBlock>
+          <TextBlock FontSize="20">工具</TextBlock>
+          <TextBlock FontSize="10" VerticalAlignment="Bottom" FontWeight="Light">对于故障排除和管理安装很有用。</TextBlock>
         </StackPanel>
         <StackPanel Orientation="Horizontal" Spacing="10">
-          <Button Command="{Binding UninstallApp}" IsEnabled="{Binding Locker.IsFree}">Uninstall App</Button>
-          <TextBlock VerticalAlignment="Center" FontSize="12">Uninstalls your selected app.</TextBlock>
+          <Button Command="{Binding UninstallApp}" IsEnabled="{Binding Locker.IsFree}">卸载此软件</Button>
+          <TextBlock VerticalAlignment="Center" FontSize="12">卸载你选中的软件</TextBlock>
         </StackPanel>
         <StackPanel Orientation="Horizontal" Spacing="10">
-          <Button Command="{Binding OpenLogsFolder}">Open Logs Folder</Button>
-          <TextBlock VerticalAlignment="Center" FontSize="12">Opens the folder where QP stores logs.</TextBlock>
+          <Button Command="{Binding OpenLogsFolder}">打开日志文件夹</Button>
+          <TextBlock VerticalAlignment="Center" FontSize="12">打开我们存储日志的文件夹</TextBlock>
         </StackPanel>
         <StackPanel Orientation="Horizontal" Spacing="10">
-          <Button IsEnabled="{Binding Locker.IsAdbAvailable}" Command="{Binding ToggleAdbLog}" Content="{Binding AdbButtonText}"/>
+          <Button IsEnabled="{Binding Locker.IsAdbAvailable}" Command="{Binding ToggleAdbLog}" Content="切换ADB日志"/>
           <TextBlock VerticalAlignment="Center" FontSize="12">
-            Starts an ADB log - you must keep your quest plugged in while you use this.
-  Useful for debugging mods not loading or other crashes.
+            开启ADB日志：为了使用这个，你必须让你的Q2保持连接
           </TextBlock>
         </StackPanel>
         <StackPanel Orientation="Horizontal" Spacing="10">
-          <Button IsEnabled="{Binding Locker.IsAdbAvailable}" Command="{Binding CreateDump}">Create Dump</Button>
+          <Button IsEnabled="{Binding Locker.IsAdbAvailable}" Command="{Binding CreateDump}">创建Dump</Button>
           <TextBlock VerticalAlignment="Center" FontSize="12">
-            Creates a dump containing lots of information about QuestPatcher and mod state.
+            创建一段调试用的信息。
           </TextBlock>
         </StackPanel>
         <StackPanel Orientation="Horizontal" Spacing="10">
-          <Button Command="{Binding QuickFix}" IsEnabled="{Binding Locker.IsFree}">Quick Fix</Button>
-          <TextBlock VerticalAlignment="Center" FontSize="12">Clears cached QuestPatcher data - try this if something isn't working.</TextBlock>
+          <Button Command="{Binding QuickFix}" IsEnabled="{Binding Locker.IsFree}">快速修复</Button>
+          <TextBlock VerticalAlignment="Center" FontSize="12">清除缓存的数据：如果有什么不工作了可以试试这个</TextBlock>
         </StackPanel>
       </StackPanel>
       <StackPanel  Margin="0 20 0 0" Spacing="10">
         <StackPanel Orientation="Horizontal" Spacing="20">
-          <TextBlock FontSize="20">Options</TextBlock>
-          <TextBlock FontSize="10" VerticalAlignment="Bottom" FontWeight="Light">QuestPatcher Settings.</TextBlock>
+          <TextBlock FontSize="20">设置</TextBlock>
+          <TextBlock FontSize="10" VerticalAlignment="Bottom" FontWeight="Light">QuestPatcher设置</TextBlock>
         </StackPanel>
         <StackPanel Orientation="Horizontal" Spacing="10">
-          <ToggleButton IsChecked="{Binding Config.PauseBeforeCompile}">Pause after Patching</ToggleButton>
-          <TextBlock VerticalAlignment="Center" FontSize="12">Shows a prompt after patching the APK, but before recompiling.
-  Useful to manually modify the APK during testing.</TextBlock>
-        </StackPanel>
-        <StackPanel Orientation="Horizontal" Spacing="10">
-          <Button Command="{Binding ChangeApp}">Change App</Button>
+          <ToggleButton IsChecked="{Binding Config.PauseBeforeCompile}">在打完补丁后暂停</ToggleButton>
           <TextBlock VerticalAlignment="Center" FontSize="12">
-            Allows you to select a different application to mod
+            在打完补丁后重新编译之前显示一个提示窗口。
+            在测试期间手动修改 APK 很有用。
           </TextBlock>
         </StackPanel>
+
       </StackPanel>
         <StackPanel Margin="0 20 0 0" Spacing="10">
             <StackPanel Orientation="Horizontal" Spacing="20">
-                <TextBlock FontSize="20">Theming</TextBlock>
-                <TextBlock FontSize="10" VerticalAlignment="Bottom" FontWeight="Light">Allows UI Customization</TextBlock>
+                <TextBlock FontSize="20">主题</TextBlock>
+                <TextBlock FontSize="10" VerticalAlignment="Bottom" FontWeight="Light">自定义UI</TextBlock>
             </StackPanel>
             <StackPanel Orientation="Horizontal" Spacing="18">
-                <TextBlock FontSize="15" VerticalAlignment="Center">Select Theme:</TextBlock>
+                <TextBlock FontSize="15" VerticalAlignment="Center">选择主题:</TextBlock>
                 <ComboBox Items="{Binding ThemeManager.AvailableThemes}" MinWidth="150" SelectedItem="{Binding ThemeManager.SelectedTheme}">
                     <ComboBox.ItemTemplate>
                         <DataTemplate>
@@ -74,7 +70,7 @@
                 </ComboBox>
             </StackPanel>
             <StackPanel Orientation="Horizontal" Spacing="10">
-                <Button Command="{Binding OpenThemesFolder}">Open Themes Folder</Button>
+                <Button Command="{Binding OpenThemesFolder}">打开主题文件夹</Button>
             </StackPanel>
         </StackPanel>
     </StackPanel>

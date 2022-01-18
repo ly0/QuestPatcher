@@ -1,4 +1,4 @@
-using Avalonia.Controls;
+﻿using Avalonia.Controls;
 using QuestPatcher.Core;
 using QuestPatcher.Models;
 using QuestPatcher.Services;
@@ -28,7 +28,7 @@ namespace QuestPatcher.ViewModels
             MainService = mainService;
 
             // Set the window name based on the QuestPatcher version
-            WindowName = $"QuestPatcher v{VersionUtil.QuestPatcherVersion}";
+            WindowName = $"QuestPatcher v{VersionUtil.QuestPatcherVersion} [Modified By MicroBlock]";
         }
     }
 }

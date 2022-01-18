@@ -64,8 +64,8 @@ namespace QuestPatcher.ViewModels
                 _logger.Error($"Patching failed!: {ex}");
                 DialogBuilder builder = new()
                 {
-                    Title = "Patching Failed",
-                    Text = "An unhandled error occured while attempting to patch the game",
+                    Title = "完蛋!出错了",
+                    Text = "在给游戏打补丁的过程中出现了一个意料外的错误。",
                     HideCancelButton = true
                 };
                 builder.WithException(ex);
@@ -84,8 +84,9 @@ namespace QuestPatcher.ViewModels
                 _logger.Debug("Patching completed successfully, displaying info dialogue");
                 DialogBuilder builder = new()
                 {
-                    Title = "Patching Complete!",
-                    Text = "Your installation is now modded!\nYou can now access installed mods, cosmetics, etc.\n\nNOTE: If you see a restore app prompt inside your headset, just press close. The chance of getting banned for modding is virtually zero, so it's nothing to worry about.",
+                    Title = "完工!",
+                    Text = "你的软件现在已经被Mod啦\n现在你可以安装Mod，灯光包等等等等" +
+                    "\n\n提示：如果你在头显里面看到了一个“恢复的应用”窗口，不必惊慌，只用点击取消即可。被封号的概率约等于不存在，所以没啥好担心的。",
                     HideCancelButton = true
                 };
                 await builder.OpenDialogue(_mainWindow);
@@ -100,12 +101,12 @@ namespace QuestPatcher.ViewModels
         {
             PatchingStageText = stage switch
             {
-                PatchingStage.NotStarted => "Not Started",
-                PatchingStage.MovingToTemp => "Moving APK to temporary location (patching stage 1/5)",
-                PatchingStage.Patching => "Modifying APK files to support mods (patching stage 2/5)",
-                PatchingStage.Signing => "Signing APK (patching stage 3/5)",
-                PatchingStage.UninstallingOriginal => "Uninstalling original APK to install modded APK (patching stage 4/5)",
-                PatchingStage.InstallingModded => "Installing modded APK (patching stage 5/5)",
+                PatchingStage.NotStarted => "未开始",
+                PatchingStage.MovingToTemp => "将APK移动至指定位置 (1/5)",
+                PatchingStage.Patching => "更改APK文件来使其支持安装mod (2/5)",
+                PatchingStage.Signing => "给APK签名 (3/5)",
+                PatchingStage.UninstallingOriginal => "卸载原有的APK (4/5)",
+                PatchingStage.InstallingModded => "安装改过的APK (5/5)",
                 _ => throw new NotImplementedException()
             };
             this.RaisePropertyChanged(nameof(PatchingStageText));

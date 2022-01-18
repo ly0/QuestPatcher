@@ -14,7 +14,7 @@ namespace QuestPatcher.ViewModels
 {
     public class LoadedViewModel : ViewModelBase
     {
-        public string SelectedAppText => $"Modding {Config.AppId}";
+        public string SelectedAppText => $"Modified by MicroBlock";
 
         public PatchingViewModel PatchingView { get; }
 
@@ -36,7 +36,7 @@ namespace QuestPatcher.ViewModels
             }
         }
 
-        public string WelcomeText => $"Welcome to {AppName} 2";
+        public string WelcomeText => $"{AppName} 2";
 
         public Config Config { get; }
         public ApkInfo AppInfo

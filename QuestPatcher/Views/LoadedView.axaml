@@ -25,28 +25,28 @@
     </DockPanel>
     
     <TabControl Classes="sidebar">
-      <TabItem Header="Patching" IsVisible="{Binding !AppInfo.IsModded}" IsSelected="{Binding !AppInfo.IsModded}">
+      <TabItem Header="打补丁" IsVisible="{Binding !AppInfo.IsModded}" IsSelected="{Binding !AppInfo.IsModded}">
         <UserControl Content="{Binding PatchingView}" />
       </TabItem>
-      <TabItem Header="Mod Management" IsVisible="{Binding AppInfo.IsModded}" IsSelected="{Binding AppInfo.IsModded}" ScrollViewer.VerticalScrollBarVisibility="Disabled">
+      <TabItem Header="管理Mod" IsVisible="{Binding AppInfo.IsModded}" IsSelected="{Binding AppInfo.IsModded}" ScrollViewer.VerticalScrollBarVisibility="Disabled">
         <UserControl Content="{Binding ManageModsView}" />
       </TabItem>
-      <TabItem Header="Cosmetics &amp; other items" IsVisible="{Binding AppInfo.IsModded}" ScrollViewer.VerticalScrollBarVisibility="Disabled">
+      <TabItem Header="杂项" IsVisible="{Binding AppInfo.IsModded}" ScrollViewer.VerticalScrollBarVisibility="Disabled">
         <UserControl Content="{Binding OtherItemsView}" />
       </TabItem>
-      <TabItem Header="Tools &amp; Options">
+      <TabItem Header="工具 &amp; 设置">
         <UserControl Content="{Binding ToolsView}" />
       </TabItem>
     </TabControl>
     
     <StackPanel Margin="25" VerticalAlignment="Bottom" HorizontalAlignment="Left" Spacing="30">
-      <ToggleSwitch IsChecked="{Binding Config.DisplayLogs}">Display Logs</ToggleSwitch>
+      <ToggleSwitch IsChecked="{Binding Config.DisplayLogs}">显示日志</ToggleSwitch>
       <StackPanel>
         <TextBlock Text="{Binding AppInfo.Version, StringFormat=APK Version: {0}}" FontWeight="Light" FontSize="12" />
-        <TextBlock Text="APK is 64 bit" IsVisible="{Binding AppInfo.Is64Bit}" FontWeight="Light" FontSize="12"/>
-        <TextBlock Text="APK is 32 bit" IsVisible="{Binding !AppInfo.Is64Bit}" FontWeight="Light" FontSize="12"/>
-        <TextBlock Text="APK is modded" IsVisible="{Binding AppInfo.IsModded}" FontWeight="Light" FontSize="12" />
-        <TextBlock Text="APK is not modded" IsVisible="{Binding !AppInfo.IsModded}" FontWeight="Light" FontSize="12" />
+        <TextBlock Text="APK是64位的" IsVisible="{Binding AppInfo.Is64Bit}" FontWeight="Light" FontSize="12"/>
+        <TextBlock Text="APK是32位的" IsVisible="{Binding !AppInfo.Is64Bit}" FontWeight="Light" FontSize="12"/>
+        <TextBlock Text="APK已经打过补丁" IsVisible="{Binding AppInfo.IsModded}" FontWeight="Light" FontSize="12" />
+        <TextBlock Text="APK没有打过补丁" IsVisible="{Binding !AppInfo.IsModded}" FontWeight="Light" FontSize="12" />
       </StackPanel>
     </StackPanel>
   </Panel>
