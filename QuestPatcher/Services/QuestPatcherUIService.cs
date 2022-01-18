@@ -96,6 +96,19 @@ namespace QuestPatcher.Services
             }
             catch (Exception ex)
             {
+                if(ex.ToString().Contains("___flag_beatsaber_not_exists___")) {
+                    DialogBuilder builder1 = new()
+                    {
+                        Title = "尚未安装BeatSaber",
+                        Text = "请先安装BeatSaber！【不支持盗版！】",
+                        HideCancelButton = true
+                    };
+                    builder1.OkButton.ReturnValue = false;
+                    await builder1.OpenDialogue(_mainWindow);
+                    ExitApplication();
+                    return;
+                }
+
                 DialogBuilder builder = new()
                 {
                     Title = "Unhandled Load Error",
@@ -159,28 +172,20 @@ namespace QuestPatcher.Services
         /// </summary>
         public async Task OpenChangeAppMenu(bool quitIfNotSelected)
         {
-            Window menuWindow = new SelectAppWindow();
-            SelectAppWindowViewModel viewModel = new(menuWindow, Config.AppId);
-            menuWindow.DataContext = viewModel;
-            menuWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
-
-            Task windowCloseTask = menuWindow.ShowDialog(_mainWindow);
-
-            viewModel.InstalledApps = await DebugBridge.ListNonDefaultPackages();
-
-            await windowCloseTask;
-            if(viewModel.SelectedApp == Config.AppId || !viewModel.DidConfirm)
+            Config.AppId = "com.beatgames.beatsaber";
+            DialogBuilder builder = new()
             {
-                if(quitIfNotSelected)
-                {
-                    ExitApplication();
-                }
-            }
-            else
+                Title = "该改版无法Mod其他应用！",
+                Text = "因为加了汉化，coremod安装等专对BeatSaber的功能，所以没有办法给其他游戏添加mod，属实抱歉~"
+            };
+            builder.OkButton.Text = "好的";
+            builder.HideCancelButton = true;
+            await builder.OpenDialogue(_mainWindow);
+            if(quitIfNotSelected)
             {
-                Config.AppId = viewModel.SelectedApp;
-                await Reload();
+                ExitApplication();
             }
+
         }
 
         private async Task Reload()

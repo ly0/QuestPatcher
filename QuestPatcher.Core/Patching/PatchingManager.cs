@@ -132,6 +132,10 @@ namespace QuestPatcher.Core.Patching
 
             int beginPermissionsIdx = packageDump.IndexOf("requested permissions:", StringComparison.Ordinal);
             int endPermissionsIdx = packageDump.IndexOf("install permissions:", StringComparison.Ordinal);
+            if(beginPermissionsIdx < 0 || endPermissionsIdx < 0)
+            {
+                throw new PatchingException("请先安装BeatSaber！");
+            }
             string permissionsString = packageDump.Substring(beginPermissionsIdx, endPermissionsIdx - beginPermissionsIdx);
 
             _logger.Information("Attempting to check modding status from package dump");
@@ -192,7 +196,7 @@ namespace QuestPatcher.Core.Patching
                 _logger.Debug("Downloading libunity index for the first time . . .");
                 JsonSerializer serializer = new();
 
-                string data = await client.DownloadStringTaskAsync("https://raw.githubusercontent.com/Lauriethefish/QuestUnstrippedUnity/main/index.json");
+                string data = await client.DownloadStringTaskAsync("https://cdn.jsdelivr.net/gh/Lauriethefish/QuestUnstrippedUnity/index.json");
                 using StringReader stringReader = new(data);
                 using JsonReader reader = new JsonTextReader(stringReader);
 
@@ -224,7 +228,7 @@ namespace QuestPatcher.Core.Patching
             using TempFile tempDownloadPath = _specialFolders.GetTempFile();
             
             await _filesDownloader.DownloadUrl(
-                    $"https://raw.githubusercontent.com/Lauriethefish/QuestUnstrippedUnity/main/versions/{correctVersion}.so",
+                    $"https://cdn.jsdelivr.net/gh/Lauriethefish/QuestUnstrippedUnity/versions/{correctVersion}.so",
                     tempDownloadPath.Path, "libunity.so");
 
             await apkArchive.AddFileAsync(tempDownloadPath.Path, Path.Combine(libsPath, "libunity.so"), true);
@@ -428,6 +432,15 @@ namespace QuestPatcher.Core.Patching
                     _logger.Warning("Using 32 bit versions!");
                     await apkArchive.AddFileAsync(await _filesDownloader.GetFileLocation(ExternalFileType.Main32), Path.Combine(libsPath, "libmain.so"), true);
                     await apkArchive.AddFileAsync(await _filesDownloader.GetFileLocation(ExternalFileType.Modloader32), Path.Combine(libsPath, "libmodloader.so"));
+                }
+
+                {
+                    // 添加中文翻译
+                    WebClient client = new WebClient();
+                    string localization=await client.DownloadStringTaskAsync("https://bs.wgzeyu.com/localization/zh-hans.json");
+                    Newtonsoft.Json.Linq.JObject lca = Newtonsoft.Json.Linq.JObject.Parse(localization);
+                    _logger.Information(lca["quest"][InstalledApp.Version]["fileurl"].ToString());
+                    return;
                 }
 
 

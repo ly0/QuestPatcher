@@ -58,7 +58,7 @@ namespace QuestPatcher.Views
         /// </summary>
         public ButtonInfo OkButton { get; set; } = new()
         {
-            Text = "OK",
+            Text = "好的",
             ReturnValue = true,
             CloseDialogue = true
         };
@@ -70,7 +70,7 @@ namespace QuestPatcher.Views
         /// </summary>
         public ButtonInfo CancelButton { get; set; } = new()
         {
-            Text = "Cancel",
+            Text = "取消",
             ReturnValue = false,
             CloseDialogue = true
         };
