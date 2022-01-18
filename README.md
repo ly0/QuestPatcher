@@ -1,8 +1,20 @@
-# QuestPatcher
+# 简介
+QuestPatcher是给游戏打补丁装Mod的工具，有了它才能安装第三方Mod、才能通过Mod给游戏添加诸如自定义歌曲等功能，它的功能类似于BMBF，只不过是一个PC软件，比BMBF更简单（对于国内用户）。
+![Q](https://bs.wgzeyu.com/oq-guide-qp/img/qp-mod.png)
 
-QuestPatcher is a GUI based mod installer for any il2cpp unity app on the Oculus Quest that runs on Windows, Linux or macOS.
-It was originally created for modding Gorilla Tag.
+该版本(Quest Patcher MWM)是 @MicroCBer 与 @WGzeyu 的修改版本，其修改的内容如下
 
-It uses Sc2ad's [QuestLoader](https://github.com/sc2ad/QuestLoader/) for loading mods and is based mostly on RedBrumbler's [CLI Tool](https://github.com/RedBrumbler/QuestAppPatcher).
+- 1.汉化界面  
+- 2.增加自动打包汉化功能
+- 3.增加自动更新功能
+- 4.将软件下载源换为国内的Mirror（求赞助！）
+- 5.增加教程页面
 
-See `QuestPatcher.Core/Resources/qmod.schema.json` for the `mod.json` that QMODs must contain, alongside their mod files.
+可能会做的功能：
+- 1.自动安装CoreMod
+- 2.Quest2内Mod开关，下载歌单
+
+# 如何下载
+点击下方**Assets**，选择对应版本下载  
+或[点我](share.wgzeyu.vip)进入泽宇的网盘，点击工具一栏下载  
+Thanks for using!  
