@@ -26,6 +26,8 @@ namespace QuestPatcher
             _config = config;
             _uiService = uiService;
             _specialFolders = specialFolders;
+
+            
         }
 
         public Task<bool> PromptAppNotInstalled()
@@ -59,6 +61,7 @@ namespace QuestPatcher
         public Task<bool> PromptAdbDisconnect(DisconnectionType type)
         {
             DialogBuilder builder = new();
+
             builder.OkButton.Text = "重试";
 
             switch (type)
@@ -74,7 +77,7 @@ namespace QuestPatcher
                             {
                                 ProcessStartInfo psi = new()
                                 {
-                                    FileName = "https://bs.wgzeyu.com/oq-guide/",
+                                    FileName = "https://bs.wgzeyu.com/oq-guide-qp/",
                                     UseShellExecute = true
                                 };
                                 Process.Start(psi);

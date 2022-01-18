@@ -1,3 +1,4 @@
+﻿using System.Diagnostics;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
@@ -8,6 +9,7 @@ namespace QuestPatcher.Views
 {
     public class LoadedView : UserControl
     {
+     
         public LoadedView()
         {
             InitializeComponent();

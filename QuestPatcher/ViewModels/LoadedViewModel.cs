@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using Serilog.Core;
 using System.Linq;
+using QuestPatcher.Views;
 
 namespace QuestPatcher.ViewModels
 {

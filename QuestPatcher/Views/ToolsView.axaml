@@ -74,6 +74,37 @@
             </StackPanel>
         </StackPanel>
     </StackPanel>
+    <StackPanel Margin="0 20 0 0" Spacing="10">
+      <TextBlock FontSize="20">教程/链接</TextBlock>
+      <TextBlock FontSize="10" VerticalAlignment="Bottom" FontWeight="Light">其实就是关于</TextBlock>
+      <Button Command="{Binding ShowTutorial}"
+            HorizontalContentAlignment="Center"
+            HorizontalAlignment="Left"
+             VerticalAlignment="Top"
+            FontSize="12" Padding="10" Margin="6">查看教程</Button>
+      <Button Command="{Binding OpenSourceAddr}"
+            HorizontalContentAlignment="Center"
+            HorizontalAlignment="Left"
+             VerticalAlignment="Top"
+            FontSize="12" Padding="10" Margin="6">开源地址</Button>
+      <Button Command="{Binding OpenSourceFKAddr}"
+      HorizontalContentAlignment="Center"
+      HorizontalAlignment="Left"
+       VerticalAlignment="Top"
+      FontSize="12" Padding="10" Margin="6">原项目地址</Button>
+
+      <Button Command="{Binding MBAddr}"
+     HorizontalContentAlignment="Center"
+     HorizontalAlignment="Left"
+      VerticalAlignment="Top"
+     FontSize="12" Padding="10" Margin="6">@MicroBlock</Button>
+      <Button Command="{Binding WGZEYUAddr}"
+     HorizontalContentAlignment="Center"
+     HorizontalAlignment="Left"
+      VerticalAlignment="Top"
+     FontSize="12" Padding="10" Margin="6">@WGzeyu</Button>
+
+    </StackPanel>
     <UserControl Width="500" Margin="0 15 0 0" VerticalAlignment="Bottom" Content="{Binding ProgressView}" HorizontalAlignment="Center" DockPanel.Dock="Bottom"/>
   </DockPanel>
 </UserControl>
