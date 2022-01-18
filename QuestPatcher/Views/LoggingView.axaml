@@ -11,7 +11,7 @@
     </Design.DataContext>
     
     <DockPanel>
-        <TextBlock DockPanel.Dock="Top" TextDecorations="Underline" HorizontalAlignment="Center">Modding Log</TextBlock>
+        <TextBlock DockPanel.Dock="Top" TextDecorations="Underline" HorizontalAlignment="Center">Mod日志</TextBlock>
         <TextBox ScrollViewer.VerticalScrollBarVisibility="Visible"
                  ScrollViewer.HorizontalScrollBarVisibility="Auto"
                  TextWrapping="Wrap"
