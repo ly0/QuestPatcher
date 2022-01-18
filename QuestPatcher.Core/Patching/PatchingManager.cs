@@ -134,7 +134,7 @@ namespace QuestPatcher.Core.Patching
             int endPermissionsIdx = packageDump.IndexOf("install permissions:", StringComparison.Ordinal);
             if(beginPermissionsIdx < 0 || endPermissionsIdx < 0)
             {
-                throw new PatchingException("请先安装BeatSaber！");
+                throw new PatchingException("___flag_beatsaber_not_exists___");
             }
             string permissionsString = packageDump.Substring(beginPermissionsIdx, endPermissionsIdx - beginPermissionsIdx);
 
@@ -189,6 +189,7 @@ namespace QuestPatcher.Core.Patching
 
         private async Task<bool> AttemptCopyUnstrippedUnity(string libsPath, ZipArchive apkArchive)
         {
+
             WebClient client = new();
             // Only download the index once
             if (_libUnityIndex == null)
@@ -226,11 +227,20 @@ namespace QuestPatcher.Core.Patching
 
             _logger.Information("Unstripped libunity found. Downloading . . .");
             using TempFile tempDownloadPath = _specialFolders.GetTempFile();
-            
-            await _filesDownloader.DownloadUrl(
-                    $"https://cdn.jsdelivr.net/gh/Lauriethefish/QuestUnstrippedUnity/versions/{correctVersion}.so",
-                    tempDownloadPath.Path, "libunity.so");
+            {
+                string str = await client.DownloadStringTaskAsync("https://ganbei-hot-update-1258625969.file.myqcloud.com/questpatcher_mirror/libunity/mirrored_files.txt");
+                string source;
+                if(str.IndexOf($"{correctVersion}.so") >= 0)
+                {
+                    source = "https://ganbei-hot-update-1258625969.file.myqcloud.com/questpatcher_mirror/libunity/";
+                    _logger.Information("Using MicroBlock's mirror");
+                }
+                else source = "https://cdn.jsdelivr.net/gh/Lauriethefish/QuestUnstrippedUnity/versions/";
 
+                await _filesDownloader.DownloadUrl(
+                        $"{source}{correctVersion}.so",
+                        tempDownloadPath.Path, "libunity.so");
+            }
             await apkArchive.AddFileAsync(tempDownloadPath.Path, Path.Combine(libsPath, "libunity.so"), true);
 
             return true;
@@ -434,13 +444,35 @@ namespace QuestPatcher.Core.Patching
                     await apkArchive.AddFileAsync(await _filesDownloader.GetFileLocation(ExternalFileType.Modloader32), Path.Combine(libsPath, "libmodloader.so"));
                 }
 
+                // 添加中文翻译
                 {
-                    // 添加中文翻译
+                    string tempDownloadPath = _specialFolders.TempFolder;
+                    _logger.Information("[ CN Translation ] Adding Chinese translation..");
+
+                    // 获取翻译文件地址
                     WebClient client = new WebClient();
                     string localization=await client.DownloadStringTaskAsync("https://bs.wgzeyu.com/localization/zh-hans.json");
                     Newtonsoft.Json.Linq.JObject lca = Newtonsoft.Json.Linq.JObject.Parse(localization);
-                    _logger.Information(lca["quest"][InstalledApp.Version]["fileurl"].ToString());
-                    return;
+                    if(!(((Newtonsoft.Json.Linq.JObject) lca["quest"]).TryGetValue(InstalledApp.Version,out _)))
+                    {
+                        _logger.Warning($"[ CN Translation ] The translation of the version {InstalledApp.Version} doesn't exist.");
+                    }
+                    else {
+                        // 获取翻译文件
+                        _logger.Information("[ CN Translation ] Downloading translation file: " +
+                            "https://bs.wgzeyu.com/localization/" + lca["quest"][InstalledApp.Version]["fileurl"].ToString());
+
+                        await _filesDownloader.DownloadUrl(
+                            "https://bs.wgzeyu.com/localization/" + lca["quest"][InstalledApp.Version]["fileurl"].ToString(),
+                            tempDownloadPath + "/templanguage_trans.lang", "templanguage_trans.lang"); ;
+                        _logger.Information("[ CN Translation ] Finished downloading translation file.");
+
+                        // 覆盖语言文件
+                        _logger.Information("[ CN Translation ] Adding the file into APK");
+                        await apkArchive.AddFileAsync(tempDownloadPath+"/templanguage_trans.lang",
+                            lca["quest"][InstalledApp.Version]["filepath"].ToString(),true);
+                        
+                    }
                 }
 
 

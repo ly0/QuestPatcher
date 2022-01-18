@@ -17,7 +17,14 @@ namespace QuestPatcher.ViewModels.Modding
         {
             ProgressView = progressView;
             ModsList = new ModListViewModel("模组", true, modManager.Mods, modManager, patchingManager, mainWindow, locker, browseManager);
-            LibrariesList = new ModListViewModel("支持库", false, modManager.Libraries, modManager, patchingManager, mainWindow, locker, browseManager);
+
+            System.Console.Out.WriteLine("Loaded libraries");
+            for(int x = 0; x < modManager.Libraries.Count; x++)
+            {
+                System.Console.Out.WriteLine(
+                  $"Lib {modManager.Libraries[x].Name}(By {modManager.Libraries[x].Author}) {modManager.Libraries[x].Version}({modManager.Libraries[x].PackageVersion})");
+            }
+         //   LibrariesList = new ModListViewModel("支持库", false, modManager.Libraries, modManager, patchingManager, mainWindow, locker, browseManager);
         }
     }
 }

@@ -46,6 +46,8 @@
 
   <PropertyGroup>
     <Nullable>enable</Nullable>
+    <StartupObject>QuestPatcher.Program</StartupObject>
+    <Authors>MicroBlock</Authors>
   </PropertyGroup>
 
 </Project>

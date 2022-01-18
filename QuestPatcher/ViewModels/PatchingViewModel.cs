@@ -103,7 +103,7 @@ namespace QuestPatcher.ViewModels
             {
                 PatchingStage.NotStarted => "未开始",
                 PatchingStage.MovingToTemp => "将APK移动至指定位置 (1/5)",
-                PatchingStage.Patching => "更改APK文件来使其支持安装mod (2/5)",
+                PatchingStage.Patching => "更改APK文件来使其支持安装mod&添加中文 (2/5)",
                 PatchingStage.Signing => "给APK签名 (3/5)",
                 PatchingStage.UninstallingOriginal => "卸载原有的APK (4/5)",
                 PatchingStage.InstallingModded => "安装改过的APK (5/5)",
