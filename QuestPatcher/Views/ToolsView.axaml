@@ -16,8 +16,8 @@
           <TextBlock FontSize="10" VerticalAlignment="Bottom" FontWeight="Light">对于故障排除和管理安装很有用。</TextBlock>
         </StackPanel>
         <StackPanel Orientation="Horizontal" Spacing="10">
-          <Button Command="{Binding UninstallApp}" IsEnabled="{Binding Locker.IsFree}">卸载此软件</Button>
-          <TextBlock VerticalAlignment="Center" FontSize="12">卸载你选中的软件</TextBlock>
+          <Button Command="{Binding UninstallApp}" IsEnabled="{Binding Locker.IsFree}">卸载游戏</Button>
+          <TextBlock VerticalAlignment="Center" FontSize="12">卸载你安装的游戏</TextBlock>
         </StackPanel>
         <StackPanel Orientation="Horizontal" Spacing="10">
           <Button Command="{Binding OpenLogsFolder}">打开日志文件夹</Button>
@@ -37,7 +37,7 @@
         </StackPanel>
         <StackPanel Orientation="Horizontal" Spacing="10">
           <Button Command="{Binding QuickFix}" IsEnabled="{Binding Locker.IsFree}">快速修复</Button>
-          <TextBlock VerticalAlignment="Center" FontSize="12">清除缓存的数据：如果有什么不工作了可以试试这个</TextBlock>
+          <TextBlock VerticalAlignment="Center" FontSize="12">清除缓存的数据：如果出现了问题可以试试这个</TextBlock>
         </StackPanel>
       </StackPanel>
       <StackPanel  Margin="0 20 0 0" Spacing="10">

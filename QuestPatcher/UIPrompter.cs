@@ -42,7 +42,7 @@ namespace QuestPatcher
             builder.WithButtons(
                 new ButtonInfo
                 {
-                    Text = "Change App",
+                    Text = "切换APP",
                     CloseDialogue = true,
                     ReturnValue = true,
                     OnClick = async () =>
@@ -105,10 +105,10 @@ namespace QuestPatcher
         {
             DialogBuilder builder = new()
             {
-                Title = "Missing libunity.so",
-                Text = "No unstripped libunity.so is available for the app you have selected. " +
-                        "This may mean that certain mods will not work correctly until one is added to the index. " +
-                        "Proceed with caution - if you're updating from an older version, it is wise to wait for the latest version of your app to be added."
+                Title = "缺少libunity.so",
+                Text = "你准备Mod的应用暂时还没有未剥离的libunity.so，" +
+                        "这可能导致某些Mod不能正常运行，直到它被添加到索引中。" +
+                        "请谨慎操作 - 如果你是从旧版升级上来，最好等待它更新再打Mod。"
             };
             builder.OkButton.Text = "Continue Anyway";
 
