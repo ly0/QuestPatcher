@@ -34,10 +34,53 @@
       <TabItem Header="杂项" IsVisible="{Binding AppInfo.IsModded}" ScrollViewer.VerticalScrollBarVisibility="Disabled">
         <UserControl Content="{Binding OtherItemsView}" />
       </TabItem>
-      <TabItem Header="工具 &amp; 设置 &amp; 教程">
+      <TabItem Header="工具 &amp; 设置">
         <UserControl Content="{Binding ToolsView}" />
       </TabItem>
+      <TabItem Header="教程 &amp; 关于">
+        <UserControl>
+          <Design.DataContext>
+            <viewModels:ToolsViewModel />
+          </Design.DataContext>
+          <DockPanel VerticalAlignment="Stretch" Margin="20 0 20 20" HorizontalAlignment="Stretch">
+            
+            <StackPanel Margin="0 20 0 0" Spacing="10">
+              <TextBlock FontSize="20">教程/关于</TextBlock>
+              <StackPanel Margin="0 20 0 0" Spacing="10" Orientation="Horizontal">
+              <Button Command="{Binding ShowTutorial}"
+                    HorizontalContentAlignment="Center"
+                    HorizontalAlignment="Left"
+                     VerticalAlignment="Top"
+                    FontSize="12" Padding="10" Margin="6">查看教程</Button>
+              <Button Command="{Binding OpenSourceAddr}"
+                    HorizontalContentAlignment="Center"
+                    HorizontalAlignment="Left"
+                     VerticalAlignment="Top"
+                    FontSize="12" Padding="10" Margin="6">开源地址</Button>
+              <Button Command="{Binding OpenSourceFKAddr}"
+              HorizontalContentAlignment="Center"
+              HorizontalAlignment="Left"
+               VerticalAlignment="Top"
+              FontSize="12" Padding="10" Margin="6">原项目地址</Button>
 
+              <Button Command="{Binding MBAddr}"
+             HorizontalContentAlignment="Center"
+             HorizontalAlignment="Left"
+              VerticalAlignment="Top"
+             FontSize="12" Padding="10" Margin="6">@MicroBlock</Button>
+              <Button Command="{Binding WGZEYUAddr}"
+             HorizontalContentAlignment="Center"
+             HorizontalAlignment="Left"
+              VerticalAlignment="Top"
+             FontSize="12" Padding="10" Margin="6">@WGzeyu</Button>
+
+            </StackPanel>
+            </StackPanel>
+            <UserControl Width="500" Margin="0 15 0 0" VerticalAlignment="Bottom" Content="{Binding ProgressView}" HorizontalAlignment="Center" DockPanel.Dock="Bottom"/>
+          </DockPanel>
+        </UserControl>
+
+      </TabItem>
     </TabControl>
 
     <StackPanel Margin="25" VerticalAlignment="Bottom" HorizontalAlignment="Left" Spacing="30">

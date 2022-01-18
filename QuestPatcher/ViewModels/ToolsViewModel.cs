@@ -15,51 +15,7 @@ namespace QuestPatcher.ViewModels
 {
     public class ToolsViewModel : ViewModelBase
     {
-        public async void ShowTutorial()
-        {
-            ProcessStartInfo psi = new()
-            {
-                FileName = "https://bs.wgzeyu.com/oq-guide-qp/",
-                UseShellExecute = true
-            };
-            Process.Start(psi);
-        }
-        public async void OpenSourceAddr()
-        {
-            ProcessStartInfo psi = new()
-            {
-                FileName = "https://github.com/MicroCBer/QuestPatcher",
-                UseShellExecute = true
-            };
-            Process.Start(psi);
-        }
-        public async void OpenSourceFKAddr()
-        {
-            ProcessStartInfo psi = new()
-            {
-                FileName = "https://github.com/Lauriethefish/QuestPatcher",
-                UseShellExecute = true
-            };
-            Process.Start(psi);
-        }
-        public async void WGZEYUAddr()
-        {
-            ProcessStartInfo psi = new()
-            {
-                FileName = "https://space.bilibili.com/557131",
-                UseShellExecute = true
-            };
-            Process.Start(psi);
-        }
-        public async void MBAddr()
-        {
-            ProcessStartInfo psi = new()
-            {
-                FileName = "https://space.bilibili.com/413164365",
-                UseShellExecute = true
-            };
-            Process.Start(psi);
-        }
+      
         public Config Config { get; }
 
         public ProgressViewModel ProgressView { get; }
