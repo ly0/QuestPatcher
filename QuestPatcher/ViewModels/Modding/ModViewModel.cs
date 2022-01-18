@@ -118,8 +118,8 @@ namespace QuestPatcher.ViewModels.Modding
             {
                 DialogBuilder builder = new()
                 {
-                    Title = "Outdated Mod",
-                    Text = $"The mod you are trying to install is for game version {Mod.PackageVersion}, however you have {_patchingManager.InstalledApp.Version}. The mod may fail to load, it may crash the game, or it might even work just fine."
+                    Title = "版本不匹配的Mod",
+                    Text = $"该Mod是为{Mod.PackageVersion}版本的游戏开发的，然而你当前安装的游戏版本是{_patchingManager.InstalledApp.Version}。启用这个Mod有可能会导致游戏崩溃，也有可能正常运行。"
                 };
                 builder.OkButton.Text = "Continue Anyway";
 
