@@ -67,8 +67,9 @@ namespace QuestPatcher.Core
         /// </summary>
         private Logger SetupLogging()
         {
+            Prompter.CheckUpdate();
             LoggerConfiguration configuration = new();
-
+                    
             SetLoggingOptions(configuration);
             return configuration.CreateLogger();
         }

@@ -1,16 +1,33 @@
 ﻿using Avalonia.Controls;
+using Newtonsoft.Json.Linq;
 using QuestPatcher.Core;
 using QuestPatcher.Core.Models;
 using QuestPatcher.Services;
 using QuestPatcher.Views;
 using System;
 using System.Diagnostics;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace QuestPatcher
 {
+    
     public class UIPrompter : IUserPrompter
     {
+        public const string NOW_VERSION = "2.3.2";
+
+
+
+
+
+
+
+
+
+
+
+
+
         private Window? _mainWindow;
         private Config? _config;
         private QuestPatcherUIService? _uiService;
@@ -29,7 +46,143 @@ namespace QuestPatcher
 
             
         }
+        public async Task<bool> CheckUpdate()
+        {
+            try
+            {
+                WebClient client = new();
+                client.Headers.Add("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.71 Safari/537.36");
+                client.Headers.Add("accept", "application/json");
+                var str = await client.DownloadStringTaskAsync("https://beatmods.wgzeyu.com/githubapi/MicroCBer/QuestPatcher/latest");
+                JObject upd = JObject.Parse(str);
+       
+            var newest = upd["tag_name"].ToString();
+            if(newest != NOW_VERSION)
+                {
+                    DialogBuilder builder = new()
+                    {
+                        Title = "有更新！",
+                        Text = $"**不更新软件，可能会遇到未知问题，强烈建议更新至最新版**\n" +
+                        $"同时，非最新版本将不受支持且不保证没有安全问题\n\n" +
+                        $"您的版本 - v{NOW_VERSION}\n" +
+                        $"最新版本 - v{newest}",
+                        HideOkButton = true,
+                        HideCancelButton = true
+                    };
+                    builder.WithButtons(
+                         new ButtonInfo
+                         {
+                             Text = "进入泽宇教程",
+                             CloseDialogue = true,
+                             ReturnValue = true,
+                             OnClick = async () =>
+                             {
+                                 ProcessStartInfo psi = new()
+                                 {
+                                     FileName = "https://bs.wgzeyu.com/oq-guide-qp/",
+                                     UseShellExecute = true
+                                 };
+                                 Process.Start(psi);
+                             }
+                         },
+                    new ButtonInfo
+                    {
+                        Text = "进入泽宇网盘",
+                        CloseDialogue = true,
+                        ReturnValue = true,
+                        OnClick = async () =>
+                        {
+                            ProcessStartInfo psi = new()
+                            {
+                                FileName = "http://share.wgzeyu.vip",
+                                UseShellExecute = true
+                            };
+                            Process.Start(psi);
+                        }
+                    },
+                    new ButtonInfo
+                    {
+                        Text = "进入开源页面Release",
+                        CloseDialogue = true,
+                        ReturnValue = true,
+                        OnClick = async () =>
+                        {
+                            ProcessStartInfo psi = new()
+                            {
+                                FileName = "https://github.com/MicroCBer/QuestPatcher/releases/latest",
+                                UseShellExecute = true
+                            };
+                            Process.Start(psi);
+                        }
+                    }
+                    );
 
+                    await builder.OpenDialogue(_mainWindow);
+                }
+               
+                return true;
+            }
+            catch(WebException ex)
+            {
+                DialogBuilder builder = new()
+                {
+                    Title = "检查更新失败"+ex.ToString(),
+                    Text = $"请手动检查更新",
+                    HideOkButton = true
+                };
+                builder.CancelButton.Text = "关闭";
+                builder.WithButtons(
+                    new ButtonInfo
+                    {
+                        Text = "进入泽宇教程",
+                        CloseDialogue = true,
+                        ReturnValue = true,
+                        OnClick = async () =>
+                        {
+                            ProcessStartInfo psi = new()
+                            {
+                                FileName = "https://bs.wgzeyu.com/oq-guide-qp/",
+                                UseShellExecute = true
+                            };
+                            Process.Start(psi);
+                        }
+                    },
+                    new ButtonInfo
+                    {
+                        Text = "进入泽宇网盘",
+                        CloseDialogue = true,
+                        ReturnValue = true,
+                        OnClick = async () =>
+                        {
+                            ProcessStartInfo psi = new()
+                            {
+                                FileName = "http://share.wgzeyu.vip",
+                                UseShellExecute = true
+                            };
+                            Process.Start(psi);
+                        }
+                    },
+                    new ButtonInfo
+                    {
+                        Text = "进入开源页面Release",
+                        CloseDialogue = true,
+                        ReturnValue = true,
+                        OnClick = async () =>
+                        {
+                            ProcessStartInfo psi = new()
+                            {
+                                FileName = "https://github.com/MicroCBer/QuestPatcher/releases/latest",
+                                UseShellExecute = true
+                            };
+                            Process.Start(psi);
+                        }
+                    }
+                );
+
+                await builder.OpenDialogue(_mainWindow);
+                return false;
+           }
+        }
         public Task<bool> PromptAppNotInstalled()
         {
             Debug.Assert(_config != null);

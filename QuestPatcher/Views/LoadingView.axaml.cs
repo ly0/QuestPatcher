@@ -1,4 +1,4 @@
-using Avalonia;
+﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 
@@ -9,6 +9,7 @@ namespace QuestPatcher.Views
         public LoadingView()
         {
             InitializeComponent();
+            
         }
 
         private void InitializeComponent()

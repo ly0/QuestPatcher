@@ -12,12 +12,14 @@ using System.Threading.Tasks;
 
 namespace QuestPatcher.ViewModels
 {
+
     public class MainWindowViewModel : ViewModelBase
     {
         public LoadedViewModel LoadedView { get; }
         public LoadingViewModel LoadingView { get; }
         
-        public string WindowName { get; }
+      
+public string WindowName { get; }
 
         public QuestPatcherService MainService { get; }
 
@@ -29,6 +31,9 @@ namespace QuestPatcher.ViewModels
 
             // Set the window name based on the QuestPatcher version
             WindowName = $"QuestPatcher v{VersionUtil.QuestPatcherVersion} [Modified By MicroBlock]";
+
+           
+           
         }
     }
 }
