@@ -198,7 +198,7 @@ namespace QuestPatcher.Core.Patching
                 _logger.Debug("Downloading libunity index for the first time . . .");
                 JsonSerializer serializer = new();
 
-                string data = await client.DownloadStringTaskAsync("https://cdn.jsdelivr.net/gh/Lauriethefish/QuestUnstrippedUnity/index.json");
+                string data = await client.DownloadStringTaskAsync("https://beatmods.wgzeyu.com/github/QuestUnstrippedUnity/index.json");
                 using StringReader stringReader = new(data);
                 using JsonReader reader = new JsonTextReader(stringReader);
 
@@ -236,7 +236,7 @@ namespace QuestPatcher.Core.Patching
                     source = "https://ganbei-hot-update-1258625969.file.myqcloud.com/questpatcher_mirror/libunity/";
                     _logger.Information("Using MicroBlock's mirror");
                 }
-                else source = "https://cdn.jsdelivr.net/gh/Lauriethefish/QuestUnstrippedUnity/versions/";
+                else source = "https://beatmods.wgzeyu.com/github/QuestUnstrippedUnity/versions/";
 
                 await _filesDownloader.DownloadUrl(
                         $"{source}{correctVersion}.so",
