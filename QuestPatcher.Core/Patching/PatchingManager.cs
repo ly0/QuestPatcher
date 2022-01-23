@@ -234,7 +234,7 @@ namespace QuestPatcher.Core.Patching
                 if(str.IndexOf($"{correctVersion}.so") >= 0)
                 {
                     source = "https://ganbei-hot-update-1258625969.file.myqcloud.com/questpatcher_mirror/libunity/";
-                    _logger.Information("Using MicroBlock's mirror");
+                    _logger.Information("[ MMirror ] Using MicroBlock's mirror");
                 }
                 else source = "https://beatmods.wgzeyu.com/github/QuestUnstrippedUnity/versions/";
 
