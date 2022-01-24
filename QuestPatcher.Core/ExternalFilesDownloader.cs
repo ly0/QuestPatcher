@@ -310,6 +310,8 @@ namespace QuestPatcher.Core
 
         private async Task DownloadFile(ExternalFileType fileType, FileInfo fileInfo, string downloadUrl, string saveLocation)
         {
+            _logger.Information($"[ Downloader ] Downloading {downloadUrl}\n" +
+                                $"               To {saveLocation}");
             try
             {
                 _logger.Information($"Downloading {fileInfo.Name} . . .");
@@ -425,6 +427,8 @@ namespace QuestPatcher.Core
         /// <param name="overrideFileName">Used instead of the file name of saveName as the DownloadingFileName</param>
         public async Task DownloadUrl(string url, string saveName, string? overrideFileName = null)
         {
+            _logger.Information($"[ Downloader ] Downloading {url}\n" +
+                                $"               To {saveName}");
             try
             {
                 DownloadProgress = 0.0;
