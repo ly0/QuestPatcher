@@ -186,6 +186,15 @@ namespace QuestPatcher.Core
             }
         }
 
+
+        public async Task MicroQuickFix(string type)
+        {
+            if(type=="adb_kill_server"){
+                        await DebugBridge.KillServer();
+            }
+            
+        }
+
         /// <summary>
         /// Clears cached QuestPatcher files.
         /// This really shouldn't be necessary, but often fixes issues.

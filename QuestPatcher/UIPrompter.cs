@@ -14,7 +14,7 @@ namespace QuestPatcher
     
     public class UIPrompter : IUserPrompter
     {
-        public const string NOW_VERSION = "2.3.6";
+        public const string NOW_VERSION = "2.3.7";
 
 
 
@@ -111,7 +111,7 @@ namespace QuestPatcher
                             {
                                 FileName = "https://github.com/MicroCBer/QuestPatcher/releases/latest",
                                 UseShellExecute = true
-                            };
+                            };  
                             Process.Start(psi);
                         }
                     }
@@ -245,6 +245,21 @@ namespace QuestPatcher
                 case DisconnectionType.MultipleDevices:
                     builder.Title = "插入了多个设备";
                     builder.Text = "多台 Android 设备已连接到你的电脑。\n请拔掉除 Quest 以外的所有设备（并关闭 BlueStacks 等模拟器）";
+                    builder.WithButtons(
+                        new ButtonInfo
+                        {
+                            Text = "快速修复·断开所有设备的连接",
+                            OnClick = async () =>
+                            {
+                               await _uiService.MicroQuickFix("adb_kill_server");
+                               DialogBuilder builder2 = new();
+                                builder2.Title = "已经断开所有设备的连接";
+                                builder2.HideCancelButton = true;
+                                builder2.Text = "已断开所有安卓设备，请先重新连接你的Quest，然后重启QuestPatcher";
+                                
+                            }
+                        }
+                    );
                     break;
                 case DisconnectionType.Unauthorized:
                     builder.Title = "设备未经授权";
