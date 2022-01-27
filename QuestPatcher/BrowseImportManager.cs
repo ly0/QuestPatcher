@@ -232,17 +232,17 @@ namespace QuestPatcher
 
             DialogBuilder builder = new()
             {
-                Title = "Import Failed"
+                Title = "导入失败"
             };
             builder.HideCancelButton = true;
 
             if (multiple)
             {
                 // Show the exceptions for multiple files in the logs to avoid a giagantic dialog
-                builder.Text = "Multiple files failed to install. Check logs for details about each";
+                builder.Text = "有多个文件安装失败，请检查日志确认详情。";
                 foreach (KeyValuePair<string, Exception> pair in failedFiles)
                 {
-                    _logger.Error($"Failed to install {Path.GetFileName(pair.Key)}: {pair.Value.Message}");
+                    _logger.Error($"{Path.GetFileName(pair.Key)}安装失败：{pair.Value.Message}");
                     _logger.Debug($"Full error: {pair.Value}");
                 }
             }
@@ -255,11 +255,11 @@ namespace QuestPatcher
                 // Don't display the full stack trace for InstallationExceptions, since these are thrown by QP and are not bugs/issues
                 if (exception is InstallationException)
                 {
-                    builder.Text = $"{Path.GetFileName(filePath)} failed to install: {exception.Message}";
+                    builder.Text = $"{Path.GetFileName(filePath)}安装失败：{exception.Message}";
                 }
                 else
                 {
-                    builder.Text = $"The file {Path.GetFileName(filePath)} failed to install";
+                    builder.Text = $"文件{Path.GetFileName(filePath)}安装失败";
                     builder.WithException(exception);
                 }
                 _logger.Error($"Failed to install {Path.GetFileName(filePath)}: {exception}");
@@ -340,8 +340,8 @@ namespace QuestPatcher
 
             DialogBuilder builder = new()
             {
-                Title = "Multiple Import Options",
-                Text = $"{Path.GetFileName(path)} can be imported as multiple types of file. Please select what you would like it to be installed as.",
+                Title = "多种导入选项",
+                Text = $"{Path.GetFileName(path)}可以作为多种不同类型的文件导入，请选择你想要安装的内容。",
                 HideOkButton = true,
                 HideCancelButton = true
             };

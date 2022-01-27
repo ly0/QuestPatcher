@@ -54,7 +54,7 @@ namespace QuestPatcher.Core.Modding
             _logger.Information($"Mod ID: {qmod.Id}, Version: {qmod.Version}, Is Library: {qmod.IsLibrary}");
             if (qmod.PackageId != _config.AppId)
             {
-                throw new InstallationException($"Mod is intended for app {qmod.PackageId}, but {_config.AppId} is selected");
+                throw new InstallationException($"该Mod适用于{qmod.PackageId}，与你目前要Mod的应用{_config.AppId}不兼容。");
             }
             
             QPMod mod = new(this, qmod.GetManifest(), _debugBridge, _logger, _filesDownloader, _modManager);
@@ -69,7 +69,7 @@ namespace QuestPatcher.Core.Modding
                 }
                 if (existingInstall.Version > qmod.Version)
                 {
-                    throw new InstallationException($"Version of existing {existingInstall.Id} ({existingInstall.Version}) is greater than installing version ({mod.Version}). Direct version downgrades are not permitted");
+                    throw new InstallationException($"现有的Mod {existingInstall.Id}({existingInstall.Version}) 版本要高于你正在安装的版本 ({mod.Version}) 。不允许直接降级安装。");
                 }
                 // Uninstall the existing mod. May throw an exception if other mods depend on the older version
                 await PrepareVersionChange(existingInstall, mod);
@@ -104,7 +104,7 @@ namespace QuestPatcher.Core.Modding
             bool didFailToMatch = false;
 
             StringBuilder errorBuilder = new();
-            errorBuilder.AppendLine($"Failed to upgrade installation of mod {currentlyInstalled.Id} to {newVersion.Version}: ");
+            errorBuilder.AppendLine($"无法将Mod{currentlyInstalled.Id}升级至{newVersion.Version}：");
             foreach (QPMod mod in ModsById.Values)
             {
 
@@ -112,7 +112,7 @@ namespace QuestPatcher.Core.Modding
                 {
                     if (dependency.Id == currentlyInstalled.Id && !dependency.VersionRange.IsSatisfied(newVersion.Version))
                     {
-                        string errorLine = $"Dependency of mod {mod.Id} requires version range {dependency.VersionRange} of {currentlyInstalled.Id}, however the version of {currentlyInstalled.Id} being upgraded to ({newVersion.Version}) does not intersect this range";
+                        string errorLine = $"{mod.Id}需要{dependency.VersionRange}版本范围的{currentlyInstalled.Id}，然而正要更新的{currentlyInstalled.Id}在升级到{newVersion.Version}后将不属于兼容范围。";
                         errorBuilder.AppendLine(errorLine);
                         
                         _logger.Error(errorLine);
