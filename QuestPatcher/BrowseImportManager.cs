@@ -384,7 +384,8 @@ namespace QuestPatcher
                     _logger.Information($"[ MMirror ] Using WGzeyu's Mirror [{modUrl}]");
                 }
                 await client.DownloadFileTaskAsync(modUrl, _specialFolders.TempFolder + "/coremod_tmp.qmod");
-                await TryImportMod(_specialFolders.TempFolder + "/coremod_tmp.qmod", true);
+                await TryImportMod(_specialFolders.TempFolder + "/coremod_tmp.qmod", true,true);
+                await _modManager.SaveMods();
             }
             return true;
         }
@@ -477,7 +478,7 @@ namespace QuestPatcher
         /// </summary>
         /// <param name="path">The path of the mod</param>
         /// <returns>Whether or not the file could be imported as a mod</returns>
-        private async Task<bool> TryImportMod(string path, bool avoidCoremodCheck = false)
+        private async Task<bool> TryImportMod(string path, bool avoidCoremodCheck = false,bool ignoreWrongVersion=false)
         {
             if(!avoidCoremodCheck) 
                 if(!(await checkCoreMods()))return false;
@@ -492,7 +493,7 @@ namespace QuestPatcher
             Debug.Assert(_patchingManager.InstalledApp != null);
 
             // Prompt the user for outdated mods instead of enabling them automatically
-            if(mod.PackageVersion != _patchingManager.InstalledApp.Version)
+            if(mod.PackageVersion != _patchingManager.InstalledApp.Version&&!ignoreWrongVersion)
             {
                 DialogBuilder builder = new()
                 {
