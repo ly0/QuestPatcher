@@ -418,8 +418,8 @@ namespace QuestPatcher
                 {
                     DialogBuilder builder = new()
                     {
-                        Title = "核心Mod完整！",
-                        Text = "恭喜你，核心Mod安装正确！"
+                        Title = "核心Mod安装正确！",
+                        Text = "恭喜你，你已经装好了核心Mod！"
                     };
                     builder.OkButton.Text = "好的";
                     builder.HideCancelButton = true;
