@@ -524,6 +524,7 @@ namespace QuestPatcher.Core.Patching
             _logger.Information("Patching complete!");
             InstalledApp.IsModded = true;
             PatchingCompleted?.Invoke(this, new EventArgs());
+            
         }
 
         /// <summary>

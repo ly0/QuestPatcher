@@ -55,10 +55,9 @@ namespace QuestPatcher.Services
             window.Height = 550;
             _operationLocker = new();
             _operationLocker.StartOperation(); // Still loading
-            _browseManager = new(OtherFilesManager, ModManager, window, Logger, PatchingManager, _operationLocker);
+            _browseManager = new(OtherFilesManager, ModManager, window, Logger, PatchingManager, _operationLocker,SpecialFolders);
             ProgressViewModel progressViewModel = new(_operationLocker, FilesDownloader);
             _otherItemsView = new OtherItemsViewModel(OtherFilesManager, window, Logger, _browseManager, _operationLocker, progressViewModel);
-
             MainWindowViewModel mainWindowViewModel = new(
                 new LoadedViewModel(
                     new PatchingViewModel(Config, _operationLocker, PatchingManager, window, Logger, progressViewModel, FilesDownloader),
@@ -79,6 +78,8 @@ namespace QuestPatcher.Services
 
             return window;
         }
+
+ 
 
         private async Task LoadAndHandleErrors()
         {
@@ -176,7 +177,7 @@ namespace QuestPatcher.Services
             DialogBuilder builder = new()
             {
                 Title = "该改版无法Mod其他应用！",
-                Text = "因为加了汉化，coremod安装等专对BeatSaber的功能，所以没有办法给其他游戏添加mod，属实抱歉~"
+                Text = "因为加了汉化，核心Mod安装等专对BeatSaber的功能，所以没有办法给其他游戏添加mod，属实抱歉~"
             };
             builder.OkButton.Text = "好的";
             builder.HideCancelButton = true;

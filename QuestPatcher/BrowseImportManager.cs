@@ -3,6 +3,7 @@ using QuestPatcher.Core.Modding;
 using QuestPatcher.Core.Patching;
 using QuestPatcher.Models;
 using QuestPatcher.Views;
+using Newtonsoft.Json.Linq;
 using Serilog.Core;
 using System;
 using System.Collections.Generic;
@@ -10,6 +11,8 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Net;
+using QuestPatcher.Core;
 
 namespace QuestPatcher
 {
@@ -20,7 +23,7 @@ namespace QuestPatcher
     {
         private struct FileImportInfo
         {
-            public string Path { get; set;  }
+            public string Path { get; set; }
 
             public FileCopyType? PreferredCopyType { get; set; }
         }
@@ -31,25 +34,28 @@ namespace QuestPatcher
         private readonly Logger _logger;
         private readonly PatchingManager _patchingManager;
         private readonly OperationLocker _locker;
-
+        private readonly JObject _coremods;
+        private readonly SpecialFolders _specialFolders;
         private readonly FileDialogFilter _modsFilter = new();
 
         private Queue<FileImportInfo>? _currentImportQueue;
 
-        public BrowseImportManager(OtherFilesManager otherFilesManager, ModManager modManager, Window mainWindow, Logger logger, PatchingManager patchingManager, OperationLocker locker)
+        public BrowseImportManager(OtherFilesManager otherFilesManager, ModManager modManager, Window mainWindow, Logger logger, PatchingManager patchingManager, OperationLocker locker,SpecialFolders specialFolders)
         {
             _otherFilesManager = otherFilesManager;
             _modManager = modManager;
+            _specialFolders = specialFolders;
             _mainWindow = mainWindow;
             _logger = logger;
             _patchingManager = patchingManager;
             _locker = locker;
-
+            WebClient client = new();
+            _coremods = JObject.Parse(client.DownloadString("https://beatmods.wgzeyu.com/github/BMBFresources/com.beatgames.beatsaber/core-mods.json"));
             _modsFilter.Name = "Quest Mods";
             _modsFilter.Extensions.Add("qmod");
         }
 
-        private static FileDialogFilter GetCosmeticFilter(FileCopyType copyType) 
+        private static FileDialogFilter GetCosmeticFilter(FileCopyType copyType)
         {
             return new FileDialogFilter
             {
@@ -130,7 +136,7 @@ namespace QuestPatcher
         private async Task ShowDialogAndHandleResult(OpenFileDialog dialog, FileCopyType? knownFileCopyType = null)
         {
             string[] files = await dialog.ShowAsync(_mainWindow);
-            if (files == null)
+            if(files == null)
             {
                 return;
             }
@@ -155,7 +161,7 @@ namespace QuestPatcher
 
             // Append all files to the new or existing queue
             _logger.Debug($"Enqueuing {files.Count} files");
-            foreach (string file in files)
+            foreach(string file in files)
             {
                 _currentImportQueue.Enqueue(new FileImportInfo
                 {
@@ -165,7 +171,7 @@ namespace QuestPatcher
             }
 
             // If a queue already existed, that will be processed with our enqueued files, so we can stop here
-            if (queueExisted)
+            if(queueExisted)
             {
                 _logger.Debug("Queue is already being processed");
                 return;
@@ -200,7 +206,7 @@ namespace QuestPatcher
         /// </summary>
         private async Task ProcessImportQueue()
         {
-            if (_currentImportQueue == null)
+            if(_currentImportQueue == null)
             {
                 throw new InvalidOperationException("Cannot process import queue if there is no import queue assigned");
             }
@@ -217,7 +223,7 @@ namespace QuestPatcher
                     _logger.Information($"Importing {path} . . .");
                     await ImportUnknownFile(path, importInfo.PreferredCopyType);
                 }
-                catch (Exception ex)
+                catch(Exception ex)
                 {
                     failedFiles[path] = ex;
                 }
@@ -226,7 +232,7 @@ namespace QuestPatcher
 
             _logger.Information($"{totalProcessed - failedFiles.Count}/{totalProcessed} files imported successfully");
 
-            if (failedFiles.Count == 0) { return; }
+            if(failedFiles.Count == 0) { return; }
 
             bool multiple = failedFiles.Count > 1;
 
@@ -236,11 +242,11 @@ namespace QuestPatcher
             };
             builder.HideCancelButton = true;
 
-            if (multiple)
+            if(multiple)
             {
                 // Show the exceptions for multiple files in the logs to avoid a giagantic dialog
                 builder.Text = "有多个文件安装失败，请检查日志确认详情。";
-                foreach (KeyValuePair<string, Exception> pair in failedFiles)
+                foreach(KeyValuePair<string, Exception> pair in failedFiles)
                 {
                     _logger.Error($"{Path.GetFileName(pair.Key)}安装失败：{pair.Value.Message}");
                     _logger.Debug($"Full error: {pair.Value}");
@@ -253,7 +259,7 @@ namespace QuestPatcher
                 Exception exception = failedFiles.Values.First();
 
                 // Don't display the full stack trace for InstallationExceptions, since these are thrown by QP and are not bugs/issues
-                if (exception is InstallationException)
+                if(exception is InstallationException)
                 {
                     builder.Text = $"{Path.GetFileName(filePath)}安装失败：{exception.Message}";
                 }
@@ -286,7 +292,7 @@ namespace QuestPatcher
 
             // Attempt to copy the file to the quest as a map, hat or similar
             List<FileCopyType> copyTypes;
-            if (preferredCopyType == null || !preferredCopyType.SupportedExtensions.Contains(extension[1..])) 
+            if(preferredCopyType == null || !preferredCopyType.SupportedExtensions.Contains(extension[1..]))
             {
                 copyTypes = _otherFilesManager.GetFileCopyTypes(extension);
             }
@@ -365,22 +371,113 @@ namespace QuestPatcher
             await builder.OpenDialogue(_mainWindow);
             return selectedType;
         }
+        private async Task<bool> InstallMods(List<JToken> mods) {
+            WebClient client = new WebClient();
+            var mirrored = await client.DownloadStringTaskAsync("https://bs.wgzeyu.com/localization/mods.json");
+            JObject obj = JObject.Parse(mirrored);
+            foreach(var mod in mods)
+            {
+                var modUrl = mod["downloadLink"].ToString();
+                if(obj.ContainsKey(modUrl))
+                {
+                    modUrl = obj[modUrl]["mirrorUrl"].ToString();
+                    _logger.Information($"[ MMirror ] Using WGzeyu's Mirror [{modUrl}]");
+                }
+                await client.DownloadFileTaskAsync(modUrl, _specialFolders.TempFolder + "/coremod_tmp.qmod");
+                await TryImportMod(_specialFolders.TempFolder + "/coremod_tmp.qmod", true);
+            }
+            return true;
+        }
+        public async Task<bool> checkCoreMods(bool dialogSuccess=false)
+        {
+            if(_coremods.ContainsKey(_patchingManager.InstalledApp.Version))
+            {
+                var coremods = (JArray) (((JObject) _coremods[_patchingManager.InstalledApp.Version])["mods"]);
+                List<JToken> missingCoremodsList = coremods.ToList();
+                foreach(var cmod in _modManager.AllMods)
+                {
+                    missingCoremodsList.RemoveAll(m => cmod.Id == (((JObject) m)["id"]).ToString() &&
+                                                       cmod.Version.ToString() == (((JObject) m)["version"]).ToString());
+                }
+                if(missingCoremodsList.Count != 0)
+                {
+                    DialogBuilder builder = new()
+                    {
+                        Title = "缺失核心Mod",
+                        Text = "你缺少了必须要安装的一些核心Mod，这会导致许多第三方Mod无法运行，因为他们均依赖核心Mod。\n" +
+                        "而自定义歌曲等基础功能，也是由核心Mod来实现的。\n" +
+                        "是否补全核心Mod？"
+                    };
+                    builder.OkButton.Text = "帮我补全";
+                    builder.CancelButton.Text = "取消";
+                    if(await builder.OpenDialogue(_mainWindow))
+                        await InstallMods(missingCoremodsList);
 
+                }
+                else if(dialogSuccess)
+                {
+                    DialogBuilder builder = new()
+                    {
+                        Title = "核心Mod完整！",
+                        Text = "恭喜你，核心Mod安装正确！"
+                    };
+                    builder.OkButton.Text = "好的";
+                    builder.HideCancelButton = true;
+                    await builder.OpenDialogue(_mainWindow);
+                }
+            }
+            else
+            {
+                DialogBuilder builder = new()
+                {
+                    Title = "未找到该版本的核心Mod！",
+                    Text = $"你当前安装的游戏版本为{_patchingManager.InstalledApp.Version}，但核心Mod还没有更新、还没有适配该版本，所以无法安装核心Mod。\n" +
+                    $"你可以先降级游戏再重新打补丁装Mod。\n若需降级请查看泽宇教程"
+                };
+                builder.OkButton.Text = "仍然安装";
+                builder.CancelButton.Text = "取消";
+                builder.WithButtons(
+                new ButtonInfo
+                {
+                    Text = "进入泽宇教程",
+                    CloseDialogue = true,
+                    ReturnValue = true,
+                    OnClick = async () =>
+                    {
+                        ProcessStartInfo psi = new()
+                        {
+                            FileName = "https://bs.wgzeyu.com/oq-guide-qp/",
+                            UseShellExecute = true
+                        };
+                        Process.Start(psi);
+                    }
+                }
+            );
+                if(!await builder.OpenDialogue(_mainWindow))
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
         /// <summary>
         /// Imports then installs a mod.
         /// Will prompt to ask the user if they want to install the mod in the case that it is outdated
         /// </summary>
         /// <param name="path">The path of the mod</param>
         /// <returns>Whether or not the file could be imported as a mod</returns>
-        private async Task<bool> TryImportMod(string path)
+        private async Task<bool> TryImportMod(string path, bool avoidCoremodCheck = false)
         {
+            if(!avoidCoremodCheck) 
+                if(!(await checkCoreMods()))return false;
+
             // Import the mod file and copy it to the quest
             IMod? mod = await _modManager.TryParseMod(path);
             if(mod is null)
             {
                 return false;
             }
-            
+
             Debug.Assert(_patchingManager.InstalledApp != null);
 
             // Prompt the user for outdated mods instead of enabling them automatically
