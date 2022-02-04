@@ -396,8 +396,19 @@ namespace QuestPatcher
                 List<JToken> missingCoremodsList = coremods.ToList();
                 foreach(var cmod in _modManager.AllMods)
                 {
-                    missingCoremodsList.RemoveAll(m => cmod.Id == (((JObject) m)["id"]).ToString() &&
-                                                       cmod.Version.ToString() == (((JObject) m)["version"]).ToString());
+                    missingCoremodsList.ForEach(async m =>
+                    {
+                        bool isThatMod = cmod.Id == (((JObject) m)["id"]).ToString() &&
+                                cmod.Version.ToString() == (((JObject) m)["version"]).ToString();
+                        if(isThatMod && !cmod.IsInstalled) await cmod.Install();
+                    });
+
+                    missingCoremodsList.RemoveAll(m => {
+                        bool isThatMod=cmod.Id == (((JObject) m)["id"]).ToString() &&
+                                cmod.Version.ToString() == (((JObject) m)["version"]).ToString();
+                        return isThatMod;
+                       });
+                    // 什么拉跨东西 但是只能这样写了，，，
                 }
                 if(missingCoremodsList.Count != 0)
                 {
