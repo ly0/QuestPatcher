@@ -60,7 +60,7 @@ namespace QuestPatcher.ViewModels.Modding
         }
         public async void OnCheckCoremodsClick()
         {
-            await _browseManager.checkCoreMods(true);
+            await _browseManager.checkCoreMods(true,true);
         }
     }
 }

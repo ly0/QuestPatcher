@@ -389,8 +389,9 @@ namespace QuestPatcher
             }
             return true;
         }
-        public async Task<bool> checkCoreMods(bool dialogSuccess=false)
+        public async Task<bool> checkCoreMods(bool dialogSuccess=false,bool lockTheLocker=false)
         {
+            if(lockTheLocker)_locker.StartOperation();
             if(_coremods.ContainsKey(_patchingManager.InstalledApp.Version))
             {
                 var coremods = (JArray) (((JObject) _coremods[_patchingManager.InstalledApp.Version])["mods"]);
@@ -467,9 +468,11 @@ namespace QuestPatcher
             );
                 if(!await builder.OpenDialogue(_mainWindow))
                 {
+                    if(lockTheLocker) _locker.FinishOperation();
                     return false;
                 }
             }
+            if(lockTheLocker) _locker.FinishOperation();
             return true;
         }
         /// <summary>
