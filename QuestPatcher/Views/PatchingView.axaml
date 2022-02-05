@@ -24,6 +24,8 @@
           <TextBlock TextAlignment="Center">在你安装mod之前，QuestPatcher必须给你的应用打上补丁</TextBlock>
           <TextBlock TextAlignment="Center">这可能会花一些时间（具体取决于你的网络连接）</TextBlock>
           <TextBlock TextAlignment="Center">在打补丁期间，请保证网络连接</TextBlock>
+          <TextBlock TextAlignment="Center" FontSize="12" Foreground="Gray" >打补丁时，我们会收集一些不包括您的隐私的相关信息以便于后续改进。</TextBlock>
+          <TextBlock TextAlignment="Center" FontSize="12" Foreground="Gray" >点击开始即视为同意</TextBlock>
         </StackPanel>
         <Button Command="{Binding StartPatching}" HorizontalContentAlignment="Center" HorizontalAlignment="Center" VerticalContentAlignment="Center" FontSize="15" Padding="12">开始打补丁！</Button>
       </StackPanel>

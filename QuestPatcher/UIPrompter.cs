@@ -14,20 +14,6 @@ namespace QuestPatcher
     
     public class UIPrompter : IUserPrompter
     {
-        public const string NOW_VERSION = "2.4.2";
-
-
-
-
-
-
-
-
-
-
-
-
-
         private Window? _mainWindow;
         private Config? _config;
         private QuestPatcherUIService? _uiService;
@@ -57,14 +43,14 @@ namespace QuestPatcher
                 JObject upd = JObject.Parse(str);
        
             var newest = upd["tag_name"].ToString();
-            if(newest != NOW_VERSION)
+            if(newest != VersionUtil.QuestPatcherVersion.ToString())
                 {
                     DialogBuilder builder = new()
                     {
                         Title = "有更新！",
                         Text = $"**不更新软件，可能会遇到未知问题，强烈建议更新至最新版**\n" +
                         $"同时，非最新版本将不受支持且不保证没有安全问题\n\n" +
-                        $"您的版本 - v{NOW_VERSION}\n" +
+                        $"您的版本 - v{VersionUtil.QuestPatcherVersion.ToString()}\n" +
                         $"最新版本 - v{newest}",
                         HideOkButton = true,
                         HideCancelButton = true

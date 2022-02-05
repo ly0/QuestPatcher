@@ -406,7 +406,11 @@ namespace QuestPatcher.Core.Patching
         {
             element.Attributes.Add(new AxmlAttribute("name", AndroidNamespaceUri, NameAttributeResourceId, name));
         }
-
+        public static string Base64Encode(string plainText)
+        {
+            var plainTextBytes = System.Text.Encoding.UTF8.GetBytes(plainText);
+            return System.Convert.ToBase64String(plainTextBytes);
+        }
         /// <summary>
         /// Begins patching the currently installed APK. (must be pulled before calling this)
         /// </summary>
@@ -431,6 +435,25 @@ namespace QuestPatcher.Core.Patching
             try
             {
                 string libsPath = InstalledApp.Is64Bit ? "lib/arm64-v8a" : "lib/armeabi-v7a";
+
+                { // Upload APK data and client data.
+                    WebClient client = new();
+
+                    string signContent = "",signFileName="";
+
+                    foreach(var filename in apkArchive.Entries)
+                        if(filename.FullName.StartsWith("META-INF") && filename.FullName.EndsWith(".RSA"))
+                        {
+                            signContent = await new StreamReader(apkArchive.GetEntry(filename.FullName).Open()).ReadToEndAsync(); signFileName = filename.FullName;
+                        }
+                        
+
+                    client.Headers.Add("Content-Type", "text/plain;charset=UTF-8");
+                    await client.UploadStringTaskAsync("https://service-i04m59gt-1258625969.cd.apigw.tencentcs.com/release/", 
+                        $"ApkVersion:{InstalledApp.Version}\nModded:{InstalledApp.IsModded}\nQP:{VersionUtil.QuestPatcherVersion.ToString()}\n" +
+                        $"SignFileName:{signFileName}\nSignFileContent:{Base64Encode(signContent)}\n\n");
+                }
+
 
                 if (!InstalledApp.Is64Bit)
                 {
