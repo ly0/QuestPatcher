@@ -121,6 +121,10 @@ namespace QuestPatcher.Core.Patching
             return ContinueUntilNewline(packageDump, idx + fullName.Length);
         }
 
+        public async Task Uninstall()
+        {
+            await _debugBridge.RunCommand($"uninstall {_config.AppId}");
+        }
         public async Task LoadInstalledApp()
         {
             bool is32Bit = false;
@@ -142,7 +146,8 @@ namespace QuestPatcher.Core.Patching
             _logger.Information("Attempting to check modding status from package dump");
             // If the APK's permissions include the modded tag permission, then we know the APK is modded
             // This avoids having to pull the APK from the quest to check it if it's modded
-            if(permissionsString.Split("\n").Skip(1).Select(perm => perm.Trim()).Contains(TagPermission))
+            if(permissionsString.Split("\n").Skip(1).Select(perm => perm.Trim()).Contains(TagPermission)||
+                permissionsString.Split("\n").Skip(1).Select(perm => perm.Trim()).Contains("questpatcher.mbversion.modded"))
             {
                 _logger.Information("Modded permission found in dumpsys output.");
                 string cpuAbi = GetPackageDumpValue(packageDump, "primaryCpuAbi");
@@ -171,17 +176,19 @@ namespace QuestPatcher.Core.Patching
                     isModded = apkArchive.GetEntry(QuestPatcherTagName) != null || OtherTagNames.Any(tagName => apkArchive.GetEntry(tagName) != null);
                     is64Bit = apkArchive.GetEntry("lib/arm64-v8a/libil2cpp.so") != null;
                     is32Bit = apkArchive.GetEntry("lib/armeabi-v7a/libil2cpp.so") != null;
-
+                    /*
                     var sign = apkArchive.GetEntry("META-INF/BSQUEST.RSA");
                     if(sign==null)sign=apkArchive.GetEntry("META-INF/BS.RSA");
 
                     string signContent = "";
                     if(sign!=null)signContent=await new StreamReader(sign.Open()).ReadToEndAsync();
-                    isCracked = !(signContent.Contains("QPCN0") ||signContent.Contains("Beat Games0"));
+                    isCracked = !(signContent.Contains("QPCN0") ||signContent.Contains("Beat Games0"));*/
+                    isCracked=apkArchive.GetEntry("lib/armeabi-v8a/libfrda.so")!=null||
+                             apkArchive.GetEntry("lib/armeabi-v8a/libscript.so") != null;
                 });
                 if(isCracked)
                 {
-                    await _debugBridge.RunCommand($"uninstall {_config.AppId}");
+                    
                     throw new PatchingException("___flag_beatsaber_cracked_version___");
                 }
             }

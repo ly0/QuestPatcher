@@ -115,7 +115,6 @@ namespace QuestPatcher.Services
                     {
                         Title = "非原版BeatSaber！",
                         Text = "请安装原版BeatSaber\n" +
-                        "已为您自动卸载目前版本\n" +
                         "【不支持盗版！！！】",
                         HideCancelButton = true
                     };
@@ -137,19 +136,12 @@ namespace QuestPatcher.Services
                     }
                 }, new ButtonInfo
                 {
-                    Text = "为何不支持BMBF/老版QuestPatcher补丁版本？",
-                    CloseDialogue = false,
-                    ReturnValue = false,
+                    Text = "卸载当前版本",
+                    CloseDialogue = true,
+                    ReturnValue = true,
                     OnClick = async () =>
                     {
-                        DialogBuilder builder1 = new()
-                        {
-                            Title = "为何不支持BMBF/老版QuestPatcher补丁版本？",
-                            Text = "BMBF补丁版本与QP版本采用的Mod管理方式有所不同，强行使用可能会出现问题，所以请安装原版BeatSaber并从QuestPatcher打补丁",
-                            HideCancelButton = true
-                        };
-                        builder1.OkButton.ReturnValue = false;
-                        await builder1.OpenDialogue(_mainWindow);
+                        await PatchingManager.Uninstall();
                     }
                 }
             );
