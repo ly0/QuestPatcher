@@ -101,7 +101,7 @@ namespace QuestPatcher.Services
                     DialogBuilder builder1 = new()
                     {
                         Title = "尚未安装BeatSaber",
-                        Text = "请先安装BeatSaber！【不支持盗版！】",
+                        Text = "请先安装正版BeatSaber！",
                         HideCancelButton = true
                     };
                     builder1.OkButton.ReturnValue = false;
@@ -114,15 +114,15 @@ namespace QuestPatcher.Services
                     DialogBuilder builder1 = new()
                     {
                         Title = "非原版BeatSaber！",
-                        Text = "请安装原版BeatSaber\n" +
-                        "【不支持盗版！！！】",
+                        Text = "检测到已安装的BeatSaber版本可能存在异常，\n" +
+                        "你安装的游戏有可能是盗版，QuestPatcher不兼容盗版，请支持正版！",
                         HideCancelButton = true
                     };
                     builder1.OkButton.ReturnValue = false;
                     builder1.WithButtons(
                 new ButtonInfo
                 {
-                    Text = "为何不支持盗版？",
+                    Text = "为何不兼容盗版？",
                     CloseDialogue = false,
                     ReturnValue = false,
                     OnClick = async () =>
