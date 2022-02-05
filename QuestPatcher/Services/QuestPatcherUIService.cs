@@ -136,6 +136,20 @@ namespace QuestPatcher.Services
                     }
                 }, new ButtonInfo
                 {
+                    Text = "购买正版",
+                    CloseDialogue = false,
+                    ReturnValue = false,
+                    OnClick = async () =>
+                    {
+                        ProcessStartInfo psi = new()
+                        {
+                            FileName = "https://www.oculus.com/experiences/quest/2448060205267927",
+                            UseShellExecute = true
+                        };
+                        Process.Start(psi);
+                    }
+                }, new ButtonInfo
+                {
                     Text = "卸载当前版本",
                     CloseDialogue = true,
                     ReturnValue = true,

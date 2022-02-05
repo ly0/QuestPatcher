@@ -183,8 +183,8 @@ namespace QuestPatcher.Core.Patching
                     string signContent = "";
                     if(sign!=null)signContent=await new StreamReader(sign.Open()).ReadToEndAsync();
                     isCracked = !(signContent.Contains("QPCN0") ||signContent.Contains("Beat Games0"));*/
-                    isCracked=apkArchive.GetEntry("lib/armeabi-v8a/libfrda.so")!=null||
-                             apkArchive.GetEntry("lib/armeabi-v8a/libscript.so") != null;
+                    isCracked=apkArchive.GetEntry("lib/arm64-v8a/libfrda.so") !=null||
+                             apkArchive.GetEntry("lib/arm64-v8a/libscript.so") != null;
                 });
                 if(isCracked)
                 {
