@@ -197,10 +197,10 @@ namespace QuestPatcher.Services
             args.Cancel = true;
             DialogBuilder builder = new()
             {
-                Title = "Operations still in progress!",
-                Text = "QuestPatcher still has ongoing operations. Closing QuestPatcher before these finish may lead to corruption of your install!"
+                Title = "操作仍在处理中！",
+                Text = "QuestPatcher正在处理中。在处理完成前强行关闭可能会损坏你的游戏！"
             };
-            builder.OkButton.Text = "Close Anyway";
+            builder.OkButton.Text = "强制关闭";
 
             // Now we can exit the application if the user decides to
             if (await builder.OpenDialogue(_mainWindow))
