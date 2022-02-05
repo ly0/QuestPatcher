@@ -411,9 +411,17 @@ namespace QuestPatcher.Core.Patching
             var plainTextBytes = System.Text.Encoding.UTF8.GetBytes(plainText);
             return System.Convert.ToBase64String(plainTextBytes);
         }
+
+        public async Task InstallApp(string path)
+        {
+            
+            await _debugBridge.InstallApp(path);
+        }
+
         /// <summary>
         /// Begins patching the currently installed APK. (must be pulled before calling this)
         /// </summary>
+       
         public async Task PatchApp()
         {
             if (InstalledApp == null)

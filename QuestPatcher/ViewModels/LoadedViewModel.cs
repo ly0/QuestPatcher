@@ -51,6 +51,11 @@ namespace QuestPatcher.ViewModels
             };
             Process.Start(psi);
         }
+        public bool Installing = true;
+        public async void UandI()
+        {
+            await _browseManager.UninstallAndInstall();
+        }
         public async void MBAddr()
         {
             ProcessStartInfo psi = new()
@@ -61,7 +66,7 @@ namespace QuestPatcher.ViewModels
             Process.Start(psi);
         }
         public string SelectedAppText => $"Modified by MicroBlock";
-
+        
         public PatchingViewModel PatchingView { get; }
 
         public ManageModsViewModel ManageModsView { get; }

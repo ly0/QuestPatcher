@@ -13,6 +13,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Net;
 using QuestPatcher.Core;
+using QuestPatcher.Services;
+using Avalonia.Media;
 
 namespace QuestPatcher
 {
@@ -37,11 +39,13 @@ namespace QuestPatcher
         private readonly JObject _coremods;
         private readonly SpecialFolders _specialFolders;
         private readonly FileDialogFilter _modsFilter = new();
-
+        private readonly QuestPatcherUIService _uiService;
+        private readonly LoadedView _loaded;
         private Queue<FileImportInfo>? _currentImportQueue;
 
-        public BrowseImportManager(OtherFilesManager otherFilesManager, ModManager modManager, Window mainWindow, Logger logger, PatchingManager patchingManager, OperationLocker locker,SpecialFolders specialFolders)
+        public BrowseImportManager(OtherFilesManager otherFilesManager, ModManager modManager, Window mainWindow, Logger logger, PatchingManager patchingManager, OperationLocker locker,SpecialFolders specialFolders, QuestPatcherUIService uiService)
         {
+            _uiService=uiService;
             _otherFilesManager = otherFilesManager;
             _modManager = modManager;
             _specialFolders = specialFolders;
@@ -63,7 +67,70 @@ namespace QuestPatcher
                 Extensions = copyType.SupportedExtensions
             };
         }
+        public async Task askToInstall()
+        {
+            OpenFileDialog dialog = new OpenFileDialog()
+            {
+                AllowMultiple = false
+            };
+            FileDialogFilter filter=new();
+            filter.Extensions.Add("apk");
+            filter.Name = "Beat Saber APKs";
+            dialog.Filters.Add(filter);
+            string[] files = await dialog.ShowAsync(_mainWindow);
+            if(files != null)
+            {
+                {
+                    DialogBuilder builder1 = new()
+                    {
+                        Title = "即将开始安装",
+                        Text = "安装可能会消耗较长时间\n在此期间窗口将无法点击\n请耐心等待直到弹窗",
+                        HideCancelButton = true
+                    };
+                    builder1.OkButton.ReturnValue = false;
+                    await builder1.OpenDialogue(_mainWindow);
+                }
+                _locker.StartOperation();
+                
+                _mainWindow.IsEnabled = false;
 
+                double w = _mainWindow.Width, h = _mainWindow.Height;
+                _mainWindow.Width = 100;
+                _mainWindow.Height = 100;
+                await _patchingManager.InstallApp(files[0]);
+                _locker.FinishOperation();
+                {
+                    DialogBuilder builder1 = new()
+                    {
+                        Title = "安装已完成！",
+                        Text = "点击确定以重启QuestPatcher",
+                        HideCancelButton = true
+                    };
+                    builder1.OkButton.ReturnValue = false;
+                    await builder1.OpenDialogue(_mainWindow);
+                }
+                _mainWindow.Width = w;
+                _mainWindow.Height = h;
+                _mainWindow.IsEnabled = true;
+                _uiService.setInstallingVisibility(false);
+                await _uiService.Reload();
+            }
+            
+            
+        }
+        public async Task UninstallAndInstall()
+        {
+            await _patchingManager.Uninstall();
+            DialogBuilder builder1 = new()
+            {
+                Title = "卸载已完成！",
+                Text = "点击确定以选择要安装的应用",
+                HideCancelButton = true
+            };
+            builder1.OkButton.ReturnValue = false;
+            await builder1.OpenDialogue(_mainWindow);
+            await askToInstall();
+        }
         private void AddAllCosmeticFilters(OpenFileDialog dialog)
         {
             foreach(FileCopyType copyType in _otherFilesManager.CurrentDestinations)

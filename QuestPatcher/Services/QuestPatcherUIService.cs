@@ -29,7 +29,7 @@ namespace QuestPatcher.Services
         private BrowseImportManager? _browseManager;
         private OtherItemsViewModel? _otherItemsView;
         private readonly ThemeManager _themeManager;
-
+        private LoadedViewModel loadedView;
         private bool _isShuttingDown;
 
         public QuestPatcherUIService(IClassicDesktopStyleApplicationLifetime appLifetime) : base(new UIPrompter())
@@ -55,11 +55,10 @@ namespace QuestPatcher.Services
             window.Height = 550;
             _operationLocker = new();
             _operationLocker.StartOperation(); // Still loading
-            _browseManager = new(OtherFilesManager, ModManager, window, Logger, PatchingManager, _operationLocker,SpecialFolders);
+            _browseManager = new(OtherFilesManager, ModManager, window, Logger, PatchingManager, _operationLocker,SpecialFolders,this);
             ProgressViewModel progressViewModel = new(_operationLocker, FilesDownloader);
             _otherItemsView = new OtherItemsViewModel(OtherFilesManager, window, Logger, _browseManager, _operationLocker, progressViewModel);
-            MainWindowViewModel mainWindowViewModel = new(
-                new LoadedViewModel(
+            loadedView = new LoadedViewModel(
                     new PatchingViewModel(Config, _operationLocker, PatchingManager, window, Logger, progressViewModel, FilesDownloader),
                     new ManageModsViewModel(ModManager, PatchingManager, window, _operationLocker, progressViewModel, _browseManager),
                     _loggingViewModel,
@@ -70,7 +69,9 @@ namespace QuestPatcher.Services
                     PatchingManager,
                     _browseManager,
                     Logger
-                ),
+                );
+            MainWindowViewModel mainWindowViewModel = new(
+                loadedView,
                 new LoadingViewModel(progressViewModel, _loggingViewModel, Config),
                 this
             );
@@ -79,7 +80,10 @@ namespace QuestPatcher.Services
             return window;
         }
 
- 
+        public void setInstallingVisibility(bool vi)
+        {
+            loadedView.Installing = vi;
+        }
 
         private async Task LoadAndHandleErrors()
         {
@@ -244,7 +248,7 @@ namespace QuestPatcher.Services
 
         }
 
-        private async Task Reload()
+        public async Task Reload()
         {
             if (_loggingViewModel != null)
             {
