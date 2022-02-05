@@ -45,7 +45,7 @@ namespace QuestPatcher.Core.Patching
         /// This permission is added to the manifest, and can be easily read from <code>adb shell dumpsys package [packageId]</code> without having to pull the entire APK.
         /// This makes loading much faster, especially on larger apps.
         /// </summary>
-        private const string TagPermission = "questpatcher.modded";
+        private const string TagPermission = "questpatcher.mbversion.modded";
 
     
         public ApkInfo? InstalledApp { get => _installedApp; private set { if (_installedApp != value) { _installedApp = value; NotifyPropertyChanged(); } } }
@@ -161,7 +161,9 @@ namespace QuestPatcher.Core.Patching
 
                 // Unfortunately, zip files do not support async, so we Task.Run this operation to avoid blocking
                 _logger.Information("Checking APK modding status . . .");
-                await Task.Run(() =>
+
+                bool isCracked=false;
+                await Task.Run(async () =>
                 {
                     using ZipArchive apkArchive = ZipFile.OpenRead(_storedApkPath);
 
@@ -169,7 +171,19 @@ namespace QuestPatcher.Core.Patching
                     isModded = apkArchive.GetEntry(QuestPatcherTagName) != null || OtherTagNames.Any(tagName => apkArchive.GetEntry(tagName) != null);
                     is64Bit = apkArchive.GetEntry("lib/arm64-v8a/libil2cpp.so") != null;
                     is32Bit = apkArchive.GetEntry("lib/armeabi-v7a/libil2cpp.so") != null;
+
+                    var sign = apkArchive.GetEntry("META-INF/BSQUEST.RSA");
+                    if(sign==null)sign=apkArchive.GetEntry("META-INF/BS.RSA");
+
+                    string signContent = "";
+                    if(sign!=null)signContent=await new StreamReader(sign.Open()).ReadToEndAsync();
+                    isCracked = !(signContent.Contains("QPCN0") ||signContent.Contains("Beat Games0"));
                 });
+                if(isCracked)
+                {
+                    await _debugBridge.RunCommand($"uninstall {_config.AppId}");
+                    throw new PatchingException("___flag_beatsaber_cracked_version___");
+                }
             }
 
 

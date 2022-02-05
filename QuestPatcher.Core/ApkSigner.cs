@@ -303,7 +303,7 @@ llAY8xXVMiYeyHboXxDPOCH8y1TgEW0Nc2cnnCKOuji2waIwrVwR
 #pragma warning disable 618
             certificateGenerator.SetSignatureAlgorithm("SHA256WithRSA");
 #pragma warning restore 618
-            var subjectDn = new X509Name("cn=Unknown");
+            var subjectDn = new X509Name("cn=QPCN");
             var issuerDn = subjectDn;
             certificateGenerator.SetIssuerDN(issuerDn);
             certificateGenerator.SetSubjectDN(subjectDn);

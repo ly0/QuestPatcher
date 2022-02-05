@@ -109,8 +109,57 @@ namespace QuestPatcher.Services
                     ExitApplication();
                     return;
                 }
+                if(ex.ToString().Contains("___flag_beatsaber_cracked_version___"))
+                {
+                    DialogBuilder builder1 = new()
+                    {
+                        Title = "非原版BeatSaber！",
+                        Text = "请安装原版BeatSaber\n" +
+                        "已为您自动卸载目前版本\n" +
+                        "【不支持盗版！！！】",
+                        HideCancelButton = true
+                    };
+                    builder1.OkButton.ReturnValue = false;
+                    builder1.WithButtons(
+                new ButtonInfo
+                {
+                    Text = "为何不支持盗版？",
+                    CloseDialogue = false,
+                    ReturnValue = false,
+                    OnClick = async () =>
+                    {
+                        ProcessStartInfo psi = new()
+                        {
+                            FileName = "https://bs.wgzeyu.com/oq-guide-qp/#sbwc8866",
+                            UseShellExecute = true
+                        };
+                        Process.Start(psi);
+                    }
+                }, new ButtonInfo
+                {
+                    Text = "为何不支持BMBF/老版QuestPatcher补丁版本？",
+                    CloseDialogue = false,
+                    ReturnValue = false,
+                    OnClick = async () =>
+                    {
+                        DialogBuilder builder1 = new()
+                        {
+                            Title = "为何不支持BMBF/老版QuestPatcher补丁版本？",
+                            Text = "BMBF补丁版本与QP版本采用的Mod管理方式有所不同，强行使用可能会出现问题，所以请安装原版BeatSaber并从QuestPatcher打补丁",
+                            HideCancelButton = true
+                        };
+                        builder1.OkButton.ReturnValue = false;
+                        await builder1.OpenDialogue(_mainWindow);
+                    }
+                }
+            );
+                    await builder1.OpenDialogue(_mainWindow);
+                    ExitApplication();
+                    return;
+                }
+                
 
-                DialogBuilder builder = new()
+               DialogBuilder builder = new()
                 {
                     Title = "Unhandled Load Error",
                     Text = "An error occured while loading",
