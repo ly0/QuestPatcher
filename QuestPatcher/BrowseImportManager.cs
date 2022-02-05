@@ -389,7 +389,7 @@ namespace QuestPatcher
             }
             return true;
         }
-        public async Task<bool> checkCoreMods(bool dialogSuccess=false,bool lockTheLocker=false)
+        public async Task<bool> checkCoreMods(bool manualCheck=false,bool lockTheLocker=false)
         {
             if(lockTheLocker)_locker.StartOperation();
             if(_coremods.ContainsKey(_patchingManager.InstalledApp.Version))
@@ -427,7 +427,7 @@ namespace QuestPatcher
                         await InstallMods(missingCoremodsList);
 
                 }
-                else if(dialogSuccess)
+                else if(manualCheck)
                 {
                     DialogBuilder builder = new()
                     {
@@ -447,6 +447,7 @@ namespace QuestPatcher
                     Text = $"你当前安装的游戏版本为{_patchingManager.InstalledApp.Version}，但核心Mod还没有更新、还没有适配该版本，所以无法安装核心Mod。\n" +
                     $"你可以先降级游戏再重新打补丁装Mod。\n若需降级请查看泽宇教程"
                 };
+                if(manualCheck)builder.HideOkButton=true;
                 builder.OkButton.Text = "仍然安装";
                 builder.CancelButton.Text = "取消";
                 builder.WithButtons(
