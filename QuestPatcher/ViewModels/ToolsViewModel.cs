@@ -35,13 +35,17 @@ namespace QuestPatcher.ViewModels
         private readonly AndroidDebugBridge _debugBridge;
         private readonly QuestPatcherUIService _uiService;
         private readonly InfoDumper _dumper;
+        private readonly BrowseImportManager _browseManager;
 
-        public ToolsViewModel(Config config, ProgressViewModel progressView, OperationLocker locker, Window mainWindow, SpecialFolders specialFolders, Logger logger, PatchingManager patchingManager, AndroidDebugBridge debugBridge, QuestPatcherUIService uiService, InfoDumper dumper, ThemeManager themeManager)
+        public ToolsViewModel(Config config, ProgressViewModel progressView, OperationLocker locker, 
+            Window mainWindow, SpecialFolders specialFolders, Logger logger, PatchingManager patchingManager, 
+            AndroidDebugBridge debugBridge, QuestPatcherUIService uiService, InfoDumper dumper, ThemeManager themeManager,BrowseImportManager browseManager)
         {
             Config = config;
             ProgressView = progressView;
             Locker = locker;
             ThemeManager = themeManager;
+            _browseManager = browseManager;
 
             _mainWindow = mainWindow;
             _specialFolders = specialFolders;
@@ -58,7 +62,16 @@ namespace QuestPatcher.ViewModels
                 this.RaisePropertyChanged(nameof(AdbButtonText));
             };
         }
+        public async void UandI()
+        {
+            await _browseManager.UninstallAndInstall();
+        }
 
+        public async void InstallServerSwitcher()
+        {
+
+            await _browseManager.InstallApk("https://ganbei-hot-update-1258625969.file.myqcloud.com/questpatcher_mirror/questserverswitcher.apk");
+        }
         public async void UninstallApp()
         {
             try

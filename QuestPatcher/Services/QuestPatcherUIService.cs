@@ -63,7 +63,7 @@ namespace QuestPatcher.Services
                     new ManageModsViewModel(ModManager, PatchingManager, window, _operationLocker, progressViewModel, _browseManager),
                     _loggingViewModel,
                     new ToolsViewModel(Config, progressViewModel, _operationLocker, window, SpecialFolders, Logger, PatchingManager, DebugBridge, this, InfoDumper,
-                        _themeManager),
+                        _themeManager,_browseManager),
                     _otherItemsView,
                     Config,
                     PatchingManager,
@@ -80,10 +80,7 @@ namespace QuestPatcher.Services
             return window;
         }
 
-        public void setInstallingVisibility(bool vi)
-        {
-            loadedView.Installing = vi;
-        }
+
 
         private async Task LoadAndHandleErrors()
         {
@@ -109,6 +106,13 @@ namespace QuestPatcher.Services
                         HideCancelButton = true
                     };
                     builder1.OkButton.ReturnValue = false;
+                    builder1.WithButtons(new ButtonInfo{
+                        Text = "安装APK",
+                        OnClick = async () =>
+                        {
+                           await _browseManager.askToInstall();
+                        }
+                    });
                     await builder1.OpenDialogue(_mainWindow);
                     ExitApplication();
                     return;

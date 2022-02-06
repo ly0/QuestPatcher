@@ -73,13 +73,10 @@
              HorizontalAlignment="Left"
               VerticalAlignment="Top"
              FontSize="12" Padding="10" Margin="6">@WGzeyu</Button>
-                <Button Command="{Binding UandI}"
-                             HorizontalContentAlignment="Center"
-                             HorizontalAlignment="Left"
-                              VerticalAlignment="Top"
-                             FontSize="12" Padding="10" Margin="6">一键降级</Button>
+
                 
             </StackPanel>
+              
             </StackPanel>
             <UserControl Width="500" Margin="0 15 0 0" VerticalAlignment="Bottom" Content="{Binding ProgressView}" HorizontalAlignment="Center" DockPanel.Dock="Bottom"/>
             

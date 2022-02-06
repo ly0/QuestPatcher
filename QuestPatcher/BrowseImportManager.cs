@@ -94,9 +94,7 @@ namespace QuestPatcher
                 
                 _mainWindow.IsEnabled = false;
 
-                double w = _mainWindow.Width, h = _mainWindow.Height;
-                _mainWindow.Width = 100;
-                _mainWindow.Height = 100;
+      
                 await _patchingManager.InstallApp(files[0]);
                 _locker.FinishOperation();
                 {
@@ -109,14 +107,42 @@ namespace QuestPatcher
                     builder1.OkButton.ReturnValue = false;
                     await builder1.OpenDialogue(_mainWindow);
                 }
-                _mainWindow.Width = w;
-                _mainWindow.Height = h;
                 _mainWindow.IsEnabled = true;
-                _uiService.setInstallingVisibility(false);
                 await _uiService.Reload();
             }
             
             
+        }
+        public async Task InstallApk(string url)
+        {
+            {
+                DialogBuilder builder1 = new()
+                {
+                    Title = "即将开始安装",
+                    Text = "安装可能会消耗较长时间\n在此期间窗口将无法点击\n请耐心等待直到弹窗",
+                    HideCancelButton = true
+                };
+                builder1.OkButton.ReturnValue = false;
+                await builder1.OpenDialogue(_mainWindow);
+            }
+            _locker.StartOperation();
+            _mainWindow.IsEnabled = false;
+            WebClient client = new();
+            await client.DownloadFileTaskAsync(url,_specialFolders.TempFolder+"/apkToInstall.apk");
+            await _patchingManager.InstallApp( _specialFolders.TempFolder + "/apkToInstall.apk");
+            _locker.FinishOperation();
+            _mainWindow.IsEnabled = true;
+            _locker.FinishOperation();
+            {
+                DialogBuilder builder1 = new()
+                {
+                    Title = "安装已完成！",
+                    Text = "点击确定以继续",
+                    HideCancelButton = true
+                };
+                builder1.OkButton.ReturnValue = false;
+                await builder1.OpenDialogue(_mainWindow);
+            }
         }
         public async Task UninstallAndInstall()
         {

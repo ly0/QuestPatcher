@@ -10,6 +10,7 @@ using System.Runtime.InteropServices;
 using Serilog.Core;
 using System.Linq;
 using QuestPatcher.Views;
+using System.Net;
 
 namespace QuestPatcher.ViewModels
 {
@@ -51,11 +52,8 @@ namespace QuestPatcher.ViewModels
             };
             Process.Start(psi);
         }
-        public bool Installing = true;
-        public async void UandI()
-        {
-            await _browseManager.UninstallAndInstall();
-        }
+        
+
         public async void MBAddr()
         {
             ProcessStartInfo psi = new()

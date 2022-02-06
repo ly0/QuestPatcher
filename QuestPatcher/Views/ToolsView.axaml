@@ -11,6 +11,15 @@
   <DockPanel VerticalAlignment="Stretch" Margin="20 0 20 20" HorizontalAlignment="Stretch">
     <StackPanel DockPanel.Dock="Top">
       <StackPanel Spacing="10">
+        <TextBlock FontSize="20">便携操作</TextBlock>
+        <StackPanel Orientation="Horizontal" Spacing="10">
+          <Button Command="{Binding UandI}" IsEnabled="{Binding Locker.IsFree}">一键降级</Button>
+          <TextBlock VerticalAlignment="Center" FontSize="12">卸载游戏，然后安装指定的游戏APK</TextBlock>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Spacing="10">
+          <Button Command="{Binding InstallServerSwitcher}" IsEnabled="{Binding Locker.IsFree}">安装ServerSwitcher</Button>
+          <TextBlock VerticalAlignment="Center" FontSize="12">将用于切换联机服务器的工具安装到Quest</TextBlock>
+        </StackPanel>
         <StackPanel Orientation="Horizontal" Spacing="15">
           <TextBlock FontSize="20">工具</TextBlock>
           <TextBlock FontSize="10" VerticalAlignment="Bottom" FontWeight="Light">对于故障排除和管理安装很有用。</TextBlock>
