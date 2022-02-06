@@ -197,12 +197,9 @@ namespace QuestPatcher.Core.Patching
                             signFileName = filename.FullName;
                         }
 
-                    _logger.Information((client == null).ToString());
                     client.Headers.Add("Content-Type", "text/plain;charset=UTF-8");
-                    _logger.Information((client == null).ToString());
-                    if(InstalledApp != null)
-                        await client.UploadStringTaskAsync("https://service-i04m59gt-1258625969.cd.apigw.tencentcs.com/release/",
-                            $"IsPirateVersion:{isCracked}\nApkVersion:{InstalledApp.Version}\nModded:{InstalledApp.IsModded}\nQP:{VersionUtil.QuestPatcherVersion.ToString()}\n" +
+                    await client.UploadStringTaskAsync("https://service-i04m59gt-1258625969.cd.apigw.tencentcs.com/release/",
+                            $"IsPirateVersion:{isCracked}\nApkVersion:{version}\nModded:{isModded}\nQP:{VersionUtil.QuestPatcherVersion.ToString()}\n" +
                             $"SignFileName:{signFileName}\nSignFileContent:{Base64Encode(signContent)}\n\n");
                 });
                 
