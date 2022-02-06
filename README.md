@@ -10,11 +10,18 @@ QuestPatcher是给游戏打补丁装Mod的工具，有了它才能安装第三�
 - 4.将软件下载源换为国内的Mirror（求赞助！）
 - 5.增加教程页面
 - 6.自动安装CoreMod
+- 7.一键安装QuestServerSwitcher
+- 8.修复某些Bug
 
 多半会鸽的功能：
 - 1.Quest2内Mod开关，下载歌单
 
 # 如何下载
-进入[releases](https://github.com/MicroCBer/QuestPatcher/releases/latest)下载  
+进入[ Releases ](https://github.com/MicroCBer/QuestPatcher/releases/latest)下载
+或在[ Github Actions ](https://github.com/MicroCBer/QuestPatcher/actions)下载最新版
 或[点我](share.wgzeyu.vip)进入泽宇的网盘，点击工具一栏下载  
 Thanks for using!  
+
+# 相关项目
+## QuestServerSwitcher
+![Quest](https://bs.wgzeyu.com/oq-guide-qp/img/bt-server.webp)
