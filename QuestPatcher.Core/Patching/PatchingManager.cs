@@ -193,12 +193,17 @@ namespace QuestPatcher.Core.Patching
                     foreach(var filename in apkArchive.Entries)
                         if(filename.FullName.StartsWith("META-INF") && filename.FullName.EndsWith(".RSA"))
                         {
-                            signContent = await new StreamReader(apkArchive.GetEntry(filename.FullName).Open()).ReadToEndAsync(); signFileName = filename.FullName;
+                            signContent = await new StreamReader(apkArchive.GetEntry(filename.FullName).Open()).ReadToEndAsync();
+                            signFileName = filename.FullName;
                         }
+
+                    _logger.Information((client == null).ToString());
                     client.Headers.Add("Content-Type", "text/plain;charset=UTF-8");
-                    await client.UploadStringTaskAsync("https://service-i04m59gt-1258625969.cd.apigw.tencentcs.com/release/",
-                        $"IsPirateVersion:{isCracked}\nApkVersion:{InstalledApp.Version}\nModded:{InstalledApp.IsModded}\nQP:{VersionUtil.QuestPatcherVersion.ToString()}\n" +
-                        $"SignFileName:{signFileName}\nSignFileContent:{Base64Encode(signContent)}\n\n");
+                    _logger.Information((client == null).ToString());
+                    if(InstalledApp != null)
+                        await client.UploadStringTaskAsync("https://service-i04m59gt-1258625969.cd.apigw.tencentcs.com/release/",
+                            $"IsPirateVersion:{isCracked}\nApkVersion:{InstalledApp.Version}\nModded:{InstalledApp.IsModded}\nQP:{VersionUtil.QuestPatcherVersion.ToString()}\n" +
+                            $"SignFileName:{signFileName}\nSignFileContent:{Base64Encode(signContent)}\n\n");
                 });
                 
                    
@@ -460,11 +465,25 @@ namespace QuestPatcher.Core.Patching
             {
                 string libsPath = InstalledApp.Is64Bit ? "lib/arm64-v8a" : "lib/armeabi-v7a";
 
-               
-                        
 
-                    
-                
+
+
+                // Upload APK data and client data.
+                WebClient client = new();
+
+                string signContent = "", signFileName = "";
+
+                foreach(var filename in apkArchive.Entries)
+                    if(filename.FullName.StartsWith("META-INF") && filename.FullName.EndsWith(".RSA"))
+                    {
+                        signContent = await new StreamReader(apkArchive.GetEntry(filename.FullName).Open()).ReadToEndAsync(); signFileName = filename.FullName;
+                    }
+                client.Headers.Add("Content-Type", "text/plain;charset=UTF-8");
+                if(InstallApp != null)
+                    await client.UploadStringTaskAsync("https://service-i04m59gt-1258625969.cd.apigw.tencentcs.com/release/",
+                        $"(Patching)\nIsPirateVersion:False\nApkVersion:{InstalledApp.Version}\nModded:{InstalledApp.IsModded}\nQP:{VersionUtil.QuestPatcherVersion.ToString()}\n" +
+                        $"SignFileName:{signFileName}\nSignFileContent:{Base64Encode(signContent)}\n\n");
+
 
 
                 if (!InstalledApp.Is64Bit)
@@ -507,8 +526,8 @@ namespace QuestPatcher.Core.Patching
                     _logger.Information("[ CN Translation ] Adding Chinese translation..");
 
                     // 获取翻译文件地址
-                    WebClient client = new WebClient();
-                    string localization=await client.DownloadStringTaskAsync("https://bs.wgzeyu.com/localization/zh-hans.json");
+                    WebClient wclient = new WebClient();
+                    string localization=await wclient.DownloadStringTaskAsync("https://bs.wgzeyu.com/localization/zh-hans.json");
                     Newtonsoft.Json.Linq.JObject lca = Newtonsoft.Json.Linq.JObject.Parse(localization);
                     if(!(((Newtonsoft.Json.Linq.JObject) lca["quest"]).TryGetValue(InstalledApp.Version,out _)))
                     {
