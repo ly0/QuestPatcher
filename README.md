@@ -17,9 +17,13 @@ QuestPatcher是给游戏打补丁装Mod的工具，有了它才能安装第三�
 - 1.Quest2内Mod开关，下载歌单
 
 # 如何下载
-进入[ Releases ](https://github.com/MicroCBer/QuestPatcher/releases/latest)下载
-或在[ Github Actions ](https://github.com/MicroCBer/QuestPatcher/actions)下载最新版
-或[点我](share.wgzeyu.vip)进入泽宇的网盘，点击工具一栏下载  
+| 下载方式 | 下载链接 |
+|---|---|
+| 泽宇的网盘 | [点我](share.wgzeyu.vip) |
+| Github Release | [ Releases ](https://github.com/MicroCBer/QuestPatcher/releases/latest) |
+| Github Actions | [ Github Actions ](https://github.com/MicroCBer/QuestPatcher/actions) |
+
+
 Thanks for using!  
 
 # 相关项目
