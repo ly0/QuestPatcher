@@ -19,7 +19,7 @@ QuestPatcher是给游戏打补丁装Mod的工具，有了它才能安装第三�
 # 如何下载
 | 下载方式 | 下载链接 |
 |---|---|
-| 泽宇的网盘 | [点我](share.wgzeyu.vip) |
+| 泽宇的网盘 | [点我](https://share.wgzeyu.vip/) |
 | Github Release | [ Releases ](https://github.com/MicroCBer/QuestPatcher/releases/latest) |
 | Github Actions | [ Github Actions ](https://github.com/MicroCBer/QuestPatcher/actions) |
 
