@@ -117,6 +117,48 @@ namespace QuestPatcher.Services
                     ExitApplication();
                     return;
                 }
+
+                if(ex.ToString().Contains("___flag_beatsaber_version_too_low___"))
+                {
+                    DialogBuilder builder1 = new()
+                    {
+                        Title = "旧版的BeatSaber！",
+                        Text = "已安装的BeatSaber版本过于老旧\n" +
+                        "QuestPatcher只支持1.16.4及以上版本，不支持远古版本。",
+                        HideCancelButton = true
+                    };
+                    builder1.OkButton.ReturnValue = false;
+                    builder1.WithButtons( new ButtonInfo
+                {
+                    Text = "购买正版",
+                    CloseDialogue = false,
+                    ReturnValue = false,
+                    OnClick = async () =>
+                    {
+                        ProcessStartInfo psi = new()
+                        {
+                            FileName = "https://www.oculus.com/experiences/quest/2448060205267927",
+                            UseShellExecute = true
+                        };
+                        Process.Start(psi);
+                    }
+                }, new ButtonInfo
+                {
+                    Text = "卸载当前版本",
+                    CloseDialogue = true,
+                    ReturnValue = true,
+                    OnClick = async () =>
+                    {
+                        await PatchingManager.Uninstall();
+                    }
+                }
+            );
+                    await builder1.OpenDialogue(_mainWindow);
+                    ExitApplication();
+                    return;
+                }
+
+                
                 if(ex.ToString().Contains("___flag_beatsaber_cracked_version___"))
                 {
                     DialogBuilder builder1 = new()

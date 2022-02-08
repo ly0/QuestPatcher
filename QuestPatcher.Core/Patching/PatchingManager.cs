@@ -211,6 +211,12 @@ namespace QuestPatcher.Core.Patching
                 }
             }
 
+            // Version Check
+            var LatestAvailableVersion = 10016004;
+            var VersionTag = version.Split('.');
+            var InstalledVersionNumber = int.Parse(VersionTag[0]) * 10000000 + int.Parse(VersionTag[1]) * 1000 + int.Parse(VersionTag[2]);
+            if(InstalledVersionNumber < LatestAvailableVersion) throw new PatchingException("___flag_beatsaber_version_too_low___");
+
 
             if (!is64Bit && !is32Bit)
             {
@@ -220,6 +226,8 @@ namespace QuestPatcher.Core.Patching
             _logger.Information((isModded ? "APK is modded" : "APK is not modded") + " and is " + (is64Bit ? "64" : "32") + " bit");
 
             InstalledApp = new ApkInfo(version, isModded, is64Bit);
+
+
         }
 
         public void ResetInstalledApp()
