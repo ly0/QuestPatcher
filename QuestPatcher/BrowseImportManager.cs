@@ -493,9 +493,10 @@ namespace QuestPatcher
                 {
                     missingCoremodsList.ForEach(async m =>
                     {
-                        bool isThatMod = cmod.Id == (((JObject) m)["id"]).ToString() &&
-                                cmod.Version.ToString() == (((JObject) m)["version"]).ToString();
-                        if(isThatMod && !cmod.IsInstalled) await cmod.Install();
+                        bool isThatMod = cmod.Id == (((JObject) m)["id"]).ToString();
+                        bool isRightVersion= cmod.Version.ToString() == (((JObject) m)["version"]).ToString();
+                        if(isThatMod && isRightVersion && !cmod.IsInstalled) await cmod.Install();
+                        if(isThatMod && !isRightVersion)await cmod.Uninstall();
                     });
 
                     missingCoremodsList.RemoveAll(m => {
