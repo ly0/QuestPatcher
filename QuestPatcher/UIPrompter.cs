@@ -267,7 +267,7 @@ namespace QuestPatcher
                         "这可能导致某些Mod不能正常运行，直到它被添加到索引中。" +
                         "请谨慎操作 - 如果你是从旧版升级上来，最好等待它更新再打Mod。"
             };
-            builder.OkButton.Text = "Continue Anyway";
+            builder.OkButton.Text = "仍然继续";
 
             return builder.OpenDialogue(_mainWindow);
         }
@@ -280,7 +280,7 @@ namespace QuestPatcher
                 Text = "您尝试打补丁的应用程序是 32 位 (armeabi-v7a)。 QuestPatcher 支持 32 版本的 QuestLoader，但大多数库（如 beatsaber-hook）不支持，除非您使用非常旧的版本。" +
                         "这将使打补丁变得更加困难。"
             };
-            builder.OkButton.Text = "Continue Anyway";
+            builder.OkButton.Text = "仍然继续";
 
             return builder.OpenDialogue(_mainWindow);
         }
