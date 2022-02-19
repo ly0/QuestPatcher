@@ -24,7 +24,7 @@ namespace QuestPatcher.Core.Modding
         public string PackageVersion => Manifest.PackageVersion;
         public string Author => Manifest.Author;
         public string? Porter => Manifest.Porter;
-        public bool IsLibrary => Manifest.IsLibrary;
+        public bool IsLibrary = false;// 取消验证Lib. 原来的代码： => Manifest.IsLibrary;
 
         public bool IsInstalled
         {
