@@ -17,8 +17,8 @@
           <TextBlock VerticalAlignment="Center" FontSize="12">卸载游戏，然后安装指定的游戏APK</TextBlock>
         </StackPanel>
         <StackPanel Orientation="Horizontal" Spacing="10">
-          <Button Command="{Binding InstallServerSwitcher}" IsEnabled="{Binding Locker.IsFree}">安装ServerSwitcher</Button>
-          <TextBlock VerticalAlignment="Center" FontSize="12">将用于切换联机服务器的工具安装到Quest</TextBlock>
+          <Button Command="{Binding InstallServerSwitcher}" IsEnabled="{Binding Locker.IsFree}">安装Icey</Button>
+          <TextBlock VerticalAlignment="Center" FontSize="12">将Icey安装到Quest</TextBlock>
         </StackPanel>
         <StackPanel Orientation="Horizontal" Spacing="15">
           <TextBlock FontSize="20">工具</TextBlock>

@@ -70,7 +70,7 @@ namespace QuestPatcher.ViewModels
         public async void InstallServerSwitcher()
         {
 
-            await _browseManager.InstallApk("https://ganbei-hot-update-1258625969.file.myqcloud.com/questpatcher_mirror/questserverswitcher.apk");
+            await _browseManager.InstallApk("https://ganbei-hot-update-1258625969.file.myqcloud.com/questpatcher_mirror/Icey-latest.apk");
         }
         public async void UninstallApp()
         {
