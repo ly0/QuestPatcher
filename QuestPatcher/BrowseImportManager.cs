@@ -128,7 +128,8 @@ namespace QuestPatcher
             _locker.StartOperation();
             _mainWindow.IsEnabled = false;
             WebClient client = new();
-            await client.DownloadFileTaskAsync(url,_specialFolders.TempFolder+"/apkToInstall.apk");
+            File.Delete(_specialFolders.TempFolder + "/apkToInstall.apk");
+            await client.DownloadFileTaskAsync(url+"?_="+ DateTime.Now.ToFileTime(), _specialFolders.TempFolder+"/apkToInstall.apk");
             await _patchingManager.InstallApp( _specialFolders.TempFolder + "/apkToInstall.apk");
             _locker.FinishOperation();
             _mainWindow.IsEnabled = true;
