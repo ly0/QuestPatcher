@@ -84,7 +84,7 @@ namespace QuestPatcher
                     DialogBuilder builder1 = new()
                     {
                         Title = "即将开始安装",
-                        Text = "安装可能会消耗较长时间\n在此期间窗口将无法点击\n请耐心等待直到弹窗",
+                        Text = "安装可能会消耗较长时间，该过程中将暂时无法点击软件窗口，请耐心等待，\n点击下方“好的”按钮，即可开始安装。",
                         HideCancelButton = true
                     };
                     builder1.OkButton.ReturnValue = false;
@@ -119,7 +119,7 @@ namespace QuestPatcher
                 DialogBuilder builder1 = new()
                 {
                     Title = "即将开始安装",
-                    Text = "安装可能会消耗较长时间\n在此期间窗口将无法点击\n请耐心等待直到弹窗",
+                    Text = "安装可能会消耗较长时间，该过程中将暂时无法点击软件窗口，请耐心等待，\n点击下方“好的”按钮，即可开始安装。",
                     HideCancelButton = true
                 };
                 builder1.OkButton.ReturnValue = false;

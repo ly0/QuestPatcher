@@ -27,5 +27,8 @@ QuestPatcher是给游戏打补丁装Mod的工具，有了它才能安装第三�
 Thanks for using!  
 
 # 相关项目
+## Icey
+Yet another mod assistant for Beat Saber on the Quest 2.
+
 ## QuestServerSwitcher
 ![Quest](https://bs.wgzeyu.com/oq-guide-qp/img/bt-server.webp)
