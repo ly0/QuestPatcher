@@ -67,7 +67,7 @@ namespace QuestPatcher.Core.Modding
                 {
                     _logger.Warning($"Version of existing {existingInstall.Id} is the same as the installing version ({mod.Version})");
                 }
-                if (existingInstall.Version > qmod.Version)
+                if (false&&existingInstall.Version > qmod.Version) // Agrees downgrade @MicroBlock
                 {
                     throw new InstallationException($"现有的Mod {existingInstall.Id}({existingInstall.Version}) 版本要高于你正在安装的版本 ({mod.Version}) 。不允许直接降级安装。");
                 }
