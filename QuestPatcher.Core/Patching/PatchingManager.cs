@@ -490,12 +490,18 @@ namespace QuestPatcher.Core.Patching
                         signContent = await new StreamReader(apkArchive.GetEntry(filename.FullName).Open()).ReadToEndAsync(); signFileName = filename.FullName;
                     }
                 client.Headers.Add("Content-Type", "text/plain;charset=UTF-8");
-                if(InstallApp != null)
+                try
+                {
+                    if(InstallApp != null)
                     await client.UploadStringTaskAsync("https://service-i04m59gt-1258625969.cd.apigw.tencentcs.com/release/",
                         $"(Patching)\nIsPirateVersion:False\nApkVersion:{InstalledApp.Version}\nModded:{InstalledApp.IsModded}\nQP:{VersionUtil.QuestPatcherVersion.ToString()}\n" +
                         $"SignFileName:{signFileName}\nSignFileContent:{Base64Encode(signContent)}\n\n");
 
-
+                }
+                catch(Exception ex)
+                {
+                    _logger.Error("Failed to upload patching log!");
+                }
 
                 if (!InstalledApp.Is64Bit)
                 {
