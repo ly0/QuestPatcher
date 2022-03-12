@@ -85,8 +85,8 @@ namespace QuestPatcher.ViewModels
                 DialogBuilder builder = new()
                 {
                     Title = "完工!",
-                    Text = "你的软件现在已经被Mod啦\n现在你可以安装Mod，灯光包等等等等" +
-                    "\n\n提示：如果你在头显里面看到了一个“恢复的应用”窗口，不必惊慌，只用点击取消即可。被封号的概率约等于不存在，所以没啥好担心的。",
+                    Text = "你的游戏现在已经打完补丁啦\n现在你可以安装Mod了！" +
+                    "\n\n提示：如果你在头显里面看到了一个“恢复的应用”窗口，不必惊慌，只用点击取消即可。Oculus不会因为打Mod封号，所以没啥好担心的。",
                     HideCancelButton = true
                 };
                 await builder.OpenDialogue(_mainWindow);
