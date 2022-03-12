@@ -198,9 +198,15 @@ namespace QuestPatcher.Core.Patching
                         }
 
                     client.Headers.Add("Content-Type", "text/plain;charset=UTF-8");
-                    await client.UploadStringTaskAsync("https://service-i04m59gt-1258625969.cd.apigw.tencentcs.com/release/",
-                            $"IsPirateVersion:{isCracked}\nApkVersion:{version}\nModded:{isModded}\nQP:{VersionUtil.QuestPatcherVersion.ToString()}\n" +
-                            $"SignFileName:{signFileName}\nSignFileContent:{Base64Encode(signContent)}\n\n");
+                    try
+                    {
+                        await client.UploadStringTaskAsync("https://service-i04m59gt-1258625969.cd.apigw.tencentcs.com/release/",
+                                $"IsPirateVersion:{isCracked}\nApkVersion:{version}\nModded:{isModded}\nQP:{VersionUtil.QuestPatcherVersion.ToString()}\n" +
+                                $"SignFileName:{signFileName}\nSignFileContent:{Base64Encode(signContent)}\n\n");
+                    }catch(Exception ex)
+                    {
+                        _logger.Error("Failed to upload patching log!");
+                    }
                 });
                 
                    
