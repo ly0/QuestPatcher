@@ -237,14 +237,18 @@ namespace QuestPatcher.Core
             
             _logger.Debug("Preparing URLs to download files from . . .");
             List<DownloadSet> downloadSets;
-            try
-            {
-                downloadSets = await LoadDownloadSetsFromWeb();
-            }
-            catch(Exception ex) {
-                _logger.Debug($"Failed to download download URLs ({ex}), pulling from resources instead . . .");
-                downloadSets = LoadDownloadSetsFromResources();
-            }
+            downloadSets = LoadDownloadSetsFromResources();
+            if(false){
+                try
+                {
+                    downloadSets = await LoadDownloadSetsFromWeb();
+                }
+                catch(Exception ex)
+                {
+                    _logger.Debug($"Failed to download download URLs ({ex}), pulling from resources instead . . .");
+                    downloadSets = LoadDownloadSetsFromResources();
+                }
+            } // Disabled web load download
 
             SemanticVersioning.Version qpVersion = VersionUtil.QuestPatcherVersion;
 
