@@ -497,7 +497,7 @@ namespace QuestPatcher
                         bool isThatMod = cmod.Id == (((JObject) m)["id"]).ToString();
                         bool isRightVersion= cmod.Version.ToString() == (((JObject) m)["version"]).ToString();
                         if(isThatMod && isRightVersion && !cmod.IsInstalled) await cmod.Install();
-                        if(isThatMod && !isRightVersion)
+                        if(isThatMod && !isRightVersion){
                             await cmod.Uninstall();
                             await _modManager.DeleteMod(cmod);
                             await _modManager.SaveMods();
