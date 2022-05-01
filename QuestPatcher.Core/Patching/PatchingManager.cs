@@ -29,6 +29,7 @@ namespace QuestPatcher.Core.Patching
         private const int RequiredAttributeResourceId = 16843406;
         private const int DebuggableAttributeResourceId = 16842767;
         private const int LegacyStorageAttributeResourceId = 16844291;
+        private const int ValueAttributeResourceId = 16842788;
 
         /// <summary>
         /// Tag added during patching.
@@ -340,7 +341,7 @@ namespace QuestPatcher.Core.Patching
                 });
             }
 
-            if (permissions.HandTracking)
+            if (permissions.HandTrackingType != HandTrackingVersion.None)
             {
                 // For some reason these are separate permissions, but we need both of them
                 addingPermissions.AddRange(new[]
@@ -392,9 +393,31 @@ namespace QuestPatcher.Core.Patching
                 _logger.Information("Adding legacy external storage flag . . .");
                 appElement.Attributes.Add(new AxmlAttribute("requestLegacyExternalStorage", AndroidNamespaceUri, LegacyStorageAttributeResourceId, true));
             }
-            
+
+
+            switch(permissions.HandTrackingType)
+            {
+                case HandTrackingVersion.None:
+                case HandTrackingVersion.V1:
+                    _logger.Debug("No need for any extra hand tracking metadata (v1/no tracking)");
+                    break;
+                case HandTrackingVersion.V1HighFrequency:
+                    _logger.Information("Adding high-frequency V1 hand-tracking. . .");
+                    AxmlElement frequencyElement = new("meta-data");
+                    AddNameAttribute(frequencyElement, "com.oculus.handtracking.frequency");
+                    frequencyElement.Attributes.Add(new AxmlAttribute("value", AndroidNamespaceUri, ValueAttributeResourceId, "HIGH"));
+                    appElement.Children.Add(frequencyElement);
+                    break;
+                case HandTrackingVersion.V2:
+                    _logger.Information("Adding V2 hand-tracking. . .");
+                    frequencyElement = new("meta-data");
+                    AddNameAttribute(frequencyElement, "com.oculus.handtracking.version");
+                    frequencyElement.Attributes.Add(new AxmlAttribute("value", AndroidNamespaceUri, ValueAttributeResourceId, "V2.0"));
+                    appElement.Children.Add(frequencyElement);
+                    break;
+            }
+
             // Save the manifest using our AXML library
-            // TODO: The AXML library is missing some features such as styles.
             _logger.Information("Saving manifest as AXML . . .");
             manifestEntry.Delete(); // Remove old manifest
             
