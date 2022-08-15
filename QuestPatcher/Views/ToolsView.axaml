@@ -57,7 +57,7 @@
         <StackPanel Orientation="Horizontal" Spacing="10">
           <ToggleButton IsChecked="{Binding Config.PauseBeforeCompile}">在打完补丁后暂停</ToggleButton>
           <TextBlock VerticalAlignment="Center" FontSize="12">
-            在打完补丁后重新编译之前显示一个提示窗口。
+            在打完补丁后重新签名之前显示一个提示窗口。
             在测试期间手动修改 APK 很有用。
           </TextBlock>
         </StackPanel>
