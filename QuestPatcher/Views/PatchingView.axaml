@@ -12,16 +12,17 @@
   <Panel>
     <DockPanel IsVisible="{Binding !IsPatchingInProgress}">
       <Panel Margin="20" DockPanel.Dock="Top">
-        <StackPanel IsVisible="{Binding Config.ShowPatchingOptions}" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Top" Spacing="25">
-          <ToggleSwitch IsChecked="{Binding Config.PatchingPermissions.ExternalFiles}" IsEnabled="False">允许读取外部存储空间</ToggleSwitch>
-          <ToggleSwitch IsChecked="{Binding Config.PatchingPermissions.Debuggable}">允许Debug</ToggleSwitch>
-          <StackPanel Orientation="Vertical">
+        <StackPanel Margin="0 15 0 0" IsVisible="{Binding Config.ShowPatchingOptions}" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Top" Spacing="25">
+            <ToggleSwitch IsChecked="{Binding Config.PatchingPermissions.ExternalFiles}" IsEnabled="False">允许读取外部存储空间</ToggleSwitch>
+            <ToggleSwitch IsChecked="{Binding Config.PatchingPermissions.Debuggable}">允许Debug</ToggleSwitch>
+            <ToggleSwitch IsChecked="{Binding Config.PatchingPermissions.FlatScreenSupport}">禁用VR要求</ToggleSwitch>
+            <StackPanel Orientation="Vertical">
             <TextBlock Margin="0 25 0 0">手部追踪类型</TextBlock>
             <ComboBox Margin="20 10 20 20" SelectedIndex="{Binding Config.PatchingPermissions.HandTrackingType}">
-              <ComboBoxItem>无</ComboBoxItem>
-              <ComboBoxItem>V1</ComboBoxItem>
-              <ComboBoxItem>V1 高频</ComboBoxItem>
-              <ComboBoxItem>V2</ComboBoxItem>
+                <ComboBoxItem>无</ComboBoxItem>
+                <ComboBoxItem>V1</ComboBoxItem>
+                <ComboBoxItem>V1 高频</ComboBoxItem>
+                <ComboBoxItem>V2</ComboBoxItem>
             </ComboBox>
           </StackPanel>
         </StackPanel>
