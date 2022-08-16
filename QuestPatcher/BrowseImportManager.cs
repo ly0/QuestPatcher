@@ -39,11 +39,11 @@ namespace QuestPatcher
         private readonly JObject _coremods;
         private readonly SpecialFolders _specialFolders;
         private readonly FileDialogFilter _modsFilter = new();
-        private readonly QuestPatcherUIService _uiService;
+        private readonly QuestPatcherUiService _uiService;
         private readonly LoadedView _loaded;
         private Queue<FileImportInfo>? _currentImportQueue;
 
-        public BrowseImportManager(OtherFilesManager otherFilesManager, ModManager modManager, Window mainWindow, PatchingManager patchingManager, OperationLocker locker,SpecialFolders specialFolders, QuestPatcherUIService uiService)
+        public BrowseImportManager(OtherFilesManager otherFilesManager, ModManager modManager, Window mainWindow, PatchingManager patchingManager, OperationLocker locker,SpecialFolders specialFolders, QuestPatcherUiService uiService)
         {
             _uiService=uiService;
             _otherFilesManager = otherFilesManager;
