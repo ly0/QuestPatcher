@@ -4,7 +4,6 @@ using QuestPatcher.Core.Patching;
 using QuestPatcher.Models;
 using QuestPatcher.Views;
 using Newtonsoft.Json.Linq;
-using Serilog.Core;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
