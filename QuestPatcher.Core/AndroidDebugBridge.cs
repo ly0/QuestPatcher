@@ -1,6 +1,4 @@
-﻿
-using Serilog.Core;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -9,6 +7,7 @@ using System.Threading.Tasks;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using Serilog;
 
 namespace QuestPatcher.Core
 {
@@ -63,7 +62,6 @@ namespace QuestPatcher.Core
 
         public event EventHandler? StoppedLogging;
 
-        private readonly Logger _logger;
         private readonly ExternalFilesDownloader _filesDownloader;
         private readonly Func<DisconnectionType, Task> _onDisconnect;
         private readonly string _adbExecutableName = OperatingSystem.IsWindows() ? "adb.exe" : "adb";
@@ -71,9 +69,8 @@ namespace QuestPatcher.Core
         private string? _adbPath;
         private Process? _logcatProcess;
 
-        public AndroidDebugBridge(Logger logger, ExternalFilesDownloader filesDownloader, Func<DisconnectionType, Task> onDisconnect)
+        public AndroidDebugBridge(ExternalFilesDownloader filesDownloader, Func<DisconnectionType, Task> onDisconnect)
         {
-            _logger = logger;
             _filesDownloader = filesDownloader;
             _onDisconnect = onDisconnect;
         }
@@ -86,7 +83,7 @@ namespace QuestPatcher.Core
             try
             {
                 var output = await ProcessUtil.InvokeAndCaptureOutput(_adbExecutableName, "version");
-
+                // If the ADB EXE is already on PATH, we can just use that
                 string? bridgeVersion = null, version = null;
 
                 {
@@ -118,9 +115,8 @@ namespace QuestPatcher.Core
                         (int.Parse(bridgeVersionSplited[0]) == 1 &&
                         int.Parse(bridgeVersionSplited[2]) > 36))
                     {
-
                         _adbPath = _adbExecutableName;
-                        _logger.Information("Located ADB install on PATH");
+                        Log.Information("Located ADB install on PATH");
                     }
                     else
                     {
@@ -149,16 +145,16 @@ namespace QuestPatcher.Core
             }
             Debug.Assert(_adbPath != null);
 
-            _logger.Debug($"Executing ADB command: adb {command}");
-            while(true)
+            Log.Debug($"Executing ADB command: adb {command}");
+            while (true)
             {
                 ProcessOutput output = await ProcessUtil.InvokeAndCaptureOutput(_adbPath, command);
-                _logger.Verbose($"Standard output: \"{output.StandardOutput}\"");
-                if(output.ErrorOutput.Length > 0)
+                Log.Verbose($"Standard output: \"{output.StandardOutput}\"");
+                if (output.ErrorOutput.Length > 0)
                 {
-                    _logger.Verbose($"Error output: \"{output.ErrorOutput}\"");
+                    Log.Verbose($"Error output: \"{output.ErrorOutput}\"");
                 }
-                _logger.Verbose($"Exit code: {output.ExitCode}");
+                Log.Verbose($"Exit code: {output.ExitCode}");
 
                 // Command execution was a success if the exit code was zero or an allowed exit code
                 // -1073740940 is always allowed as some ADB installations return it randomly, even when commands are successful.
@@ -327,7 +323,7 @@ namespace QuestPatcher.Core
             {
                 if(path.Value.Contains("com.beatgames.beatsaber/files/mods/") || path.Value.Contains("com.beatgames.beatsaber/files/libs/"))
                 {
-                    _logger.Warning("[ MFix ] Creating mods and libs folder.");
+                    Log.Warning("[ MFix ] Creating mods and libs folder.");
                     List<string> folders = new();
                     folders.Add("/sdcard/Android/data/com.beatgames.beatsaber/files/mods/");
                     folders.Add("/sdcard/Android/data/com.beatgames.beatsaber/files/libs/");
@@ -377,7 +373,7 @@ namespace QuestPatcher.Core
             {
                 if(ex.ToString().Contains("BeatTogether.cfg"))
                 {
-                    _logger.Warning("[ MFix ] Threw error about BeatTogether.cfg.Handled.");
+                    Log.Warning("[ MFix ] Threw error about BeatTogether.cfg.Handled.");
                 }
                 else throw ex;
             }
@@ -480,7 +476,7 @@ namespace QuestPatcher.Core
                 }
                 catch(ObjectDisposedException)
                 {
-                    _logger.Debug("ADB attempted to send data after it was closed");
+                    Log.Debug("ADB attempted to send data after it was closed");
                 }
             };
 

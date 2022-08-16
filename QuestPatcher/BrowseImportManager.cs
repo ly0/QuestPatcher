@@ -15,6 +15,7 @@ using System.Net;
 using QuestPatcher.Core;
 using QuestPatcher.Services;
 using Avalonia.Media;
+using Serilog;
 
 namespace QuestPatcher
 {
@@ -33,7 +34,6 @@ namespace QuestPatcher
         private readonly OtherFilesManager _otherFilesManager;
         private readonly ModManager _modManager;
         private readonly Window _mainWindow;
-        private readonly Logger _logger;
         private readonly PatchingManager _patchingManager;
         private readonly OperationLocker _locker;
         private readonly JObject _coremods;
@@ -43,14 +43,13 @@ namespace QuestPatcher
         private readonly LoadedView _loaded;
         private Queue<FileImportInfo>? _currentImportQueue;
 
-        public BrowseImportManager(OtherFilesManager otherFilesManager, ModManager modManager, Window mainWindow, Logger logger, PatchingManager patchingManager, OperationLocker locker,SpecialFolders specialFolders, QuestPatcherUIService uiService)
+        public BrowseImportManager(OtherFilesManager otherFilesManager, ModManager modManager, Window mainWindow, PatchingManager patchingManager, OperationLocker locker,SpecialFolders specialFolders, QuestPatcherUIService uiService)
         {
             _uiService=uiService;
             _otherFilesManager = otherFilesManager;
             _modManager = modManager;
             _specialFolders = specialFolders;
             _mainWindow = mainWindow;
-            _logger = logger;
             _patchingManager = patchingManager;
             _locker = locker;
             WebClient client = new();
@@ -267,8 +266,8 @@ namespace QuestPatcher
             }
 
             // Append all files to the new or existing queue
-            _logger.Debug($"Enqueuing {files.Count} files");
-            foreach(string file in files)
+            Log.Debug($"Enqueuing {files.Count} files");
+            foreach (string file in files)
             {
                 _currentImportQueue.Enqueue(new FileImportInfo
                 {
@@ -280,18 +279,18 @@ namespace QuestPatcher
             // If a queue already existed, that will be processed with our enqueued files, so we can stop here
             if(queueExisted)
             {
-                _logger.Debug("Queue is already being processed");
+                Log.Debug("Queue is already being processed");
                 return;
             }
 
             // Otherwise, we process the current queue
-            _logger.Debug("Processing queue . . .");
+            Log.Debug("Processing queue . . .");
 
             // Do nothing if attempting to import files when operations are ongoing that are not file imports
             // TODO: Ideally this would wait until the lock is free and then continue
             if(!_locker.IsFree)
             {
-                _logger.Error("Failed to process files: Operations are still ongoing");
+                Log.Error("Failed to process files: Operations are still ongoing");
                 _currentImportQueue = null;
                 return;
             }
@@ -327,7 +326,7 @@ namespace QuestPatcher
                 totalProcessed++;
                 try
                 {
-                    _logger.Information($"Importing {path} . . .");
+                    Log.Information($"Importing {path} . . .");
                     await ImportUnknownFile(path, importInfo.PreferredCopyType);
                 }
                 catch(Exception ex)
@@ -337,7 +336,7 @@ namespace QuestPatcher
             }
             _currentImportQueue = null; // New files added should go to a new queue
 
-            _logger.Information($"{totalProcessed - failedFiles.Count}/{totalProcessed} files imported successfully");
+            Log.Information($"{totalProcessed - failedFiles.Count}/{totalProcessed} files imported successfully");
 
             if(failedFiles.Count == 0) { return; }
 
@@ -355,8 +354,8 @@ namespace QuestPatcher
                 builder.Text = "有多个文件安装失败，请检查日志确认详情。";
                 foreach(KeyValuePair<string, Exception> pair in failedFiles)
                 {
-                    _logger.Error($"{Path.GetFileName(pair.Key)}安装失败：{pair.Value.Message}");
-                    _logger.Debug($"Full error: {pair.Value}");
+                    Log.Error($"{Path.GetFileName(pair.Key)}安装失败：{pair.Value.Message}");
+                    Log.Debug($"Full error: {pair.Value}");
                 }
             }
             else
@@ -375,7 +374,7 @@ namespace QuestPatcher
                     builder.Text = $"文件{Path.GetFileName(filePath)}安装失败";
                     builder.WithException(exception);
                 }
-                _logger.Error($"Failed to install {Path.GetFileName(filePath)}: {exception}");
+                Log.Error($"Failed to install {Path.GetFileName(filePath)}: {exception}");
             }
 
             await builder.OpenDialogue(_mainWindow);
@@ -420,7 +419,7 @@ namespace QuestPatcher
                     FileCopyType? chosen = await OpenSelectCopyTypeDialog(copyTypes, path);
                     if(chosen == null)
                     {
-                        _logger.Information($"Cancelling file {Path.GetFileName(path)}");
+                        Log.Information($"Cancelling file {Path.GetFileName(path)}");
                         return;
                     }
                     else
@@ -488,7 +487,7 @@ namespace QuestPatcher
                 if(obj.ContainsKey(modUrl))
                 {
                     modUrl = obj[modUrl]["mirrorUrl"].ToString();
-                    _logger.Information($"[ MMirror ] Using WGzeyu's Mirror [{modUrl}]");
+                    Log.Information($"[ MMirror ] Using WGzeyu's Mirror [{modUrl}]");
                 }
                 await client.DownloadFileTaskAsync(modUrl, _specialFolders.TempFolder + "/coremod_tmp.qmod");
                 await TryImportMod(_specialFolders.TempFolder + "/coremod_tmp.qmod", true,true);
