@@ -609,7 +609,7 @@ namespace QuestPatcher
             Debug.Assert(_patchingManager.InstalledApp != null);
 
             // Prompt the user for outdated mods instead of enabling them automatically
-            if(mod.PackageVersion != _patchingManager.InstalledApp.Version&&!ignoreWrongVersion)
+            if(mod.PackageVersion != null && mod.PackageVersion != _patchingManager.InstalledApp.Version &&!ignoreWrongVersion)
             {
                 DialogBuilder builder = new()
                 {

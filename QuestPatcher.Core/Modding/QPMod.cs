@@ -21,7 +21,7 @@ namespace QuestPatcher.Core.Modding
         public string Name => Manifest.Name;
         public string? Description => Manifest.Description;
         public SemanticVersioning.Version Version => Manifest.Version;
-        public string PackageVersion => Manifest.PackageVersion;
+        public string? PackageVersion => Manifest.PackageVersion;
         public string Author => Manifest.Author;
         public string? Porter => Manifest.Porter;
         public bool IsLibrary => false;
