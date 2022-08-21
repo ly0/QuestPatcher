@@ -278,9 +278,9 @@ namespace QuestPatcher.Core
             await RunShellCommand($"mkdir -p {path.WithForwardSlashes().EscapeBash()}");
         }
 
-        public async Task RemoveFile(string path)
+        public async Task DeleteFile(string path)
         {
-            await RunShellCommand($"rm {path.WithForwardSlashes().EscapeBash()}");
+            await RunShellCommand($"rm -f {path.WithForwardSlashes().EscapeBash()}");
         }
 
         public async Task RemoveDirectory(string path)
@@ -349,7 +349,7 @@ namespace QuestPatcher.Core
             List<string> commands = new();
             foreach(string path in paths)
             {
-                commands.Add($"rm {path.WithForwardSlashes().EscapeBash()}");
+                commands.Add($"rm -f {path.WithForwardSlashes().EscapeBash()}");
             }
             try
             {
