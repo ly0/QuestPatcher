@@ -312,16 +312,6 @@ namespace QuestPatcher.Core
 
             foreach(KeyValuePair<string, string> path in paths)
             {
-                // TODO: Sky: Check after cherry pick copy files folder commit
-                if(path.Value.Contains("com.beatgames.beatsaber/files/mods/") || path.Value.Contains("com.beatgames.beatsaber/files/libs/"))
-                {
-                    Log.Warning("[ MFix ] Creating mods and libs folder.");
-                    List<string> folders = new();
-                    folders.Add("/sdcard/Android/data/com.beatgames.beatsaber/files/mods/");
-                    folders.Add("/sdcard/Android/data/com.beatgames.beatsaber/files/libs/");
-                    await CreateDirectories(folders); ;
-                }
-                
                 commands.Add($"cp {path.Key.WithForwardSlashes().EscapeBash()} {path.Value.WithForwardSlashes().EscapeBash()}");
             }
 
