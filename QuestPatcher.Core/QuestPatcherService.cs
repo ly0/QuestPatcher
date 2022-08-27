@@ -18,6 +18,7 @@ namespace QuestPatcher.Core
     public abstract class QuestPatcherService : INotifyPropertyChanged
     {
         protected SpecialFolders SpecialFolders { get; }
+        public Logger Logger { get; }
         protected PatchingManager PatchingManager { get; }
         protected ModManager ModManager { get; }
         protected AndroidDebugBridge DebugBridge { get; }
@@ -38,22 +39,21 @@ namespace QuestPatcher.Core
 
         protected QuestPatcherService(IUserPrompter prompter)
         {
+            Prompter = prompter;
             SpecialFolders = new SpecialFolders(); // Load QuestPatcher application folders
 
-            Log.Logger = SetupLogging();
-
-            Prompter = prompter;
-            _configManager = new ConfigManager(SpecialFolders);
+            Logger = SetupLogging();
+            _configManager = new ConfigManager(Logger, SpecialFolders);
             _configManager.GetOrLoadConfig(); // Load the config file
-            FilesDownloader = new ExternalFilesDownloader(SpecialFolders);
-            DebugBridge = new AndroidDebugBridge(FilesDownloader, OnAdbDisconnect);
+            FilesDownloader = new ExternalFilesDownloader(SpecialFolders, Logger);
+            DebugBridge = new AndroidDebugBridge(Logger, FilesDownloader, OnAdbDisconnect);
+            PatchingManager = new PatchingManager(Logger, Config, DebugBridge, SpecialFolders, FilesDownloader, Prompter, new ApkSigner(), ExitApplication);
+            ModManager = new ModManager(Config, DebugBridge, Logger);
+            ModManager.RegisterModProvider(new QModProvider(ModManager, Config, Logger, DebugBridge, FilesDownloader));
             OtherFilesManager = new OtherFilesManager(Config, DebugBridge);
-            ModManager = new ModManager(Config, DebugBridge, OtherFilesManager);
-            ModManager.RegisterModProvider(new QModProvider(ModManager, Config, DebugBridge, FilesDownloader));
-            PatchingManager = new PatchingManager(Config, DebugBridge, SpecialFolders, FilesDownloader, Prompter, new ApkSigner(), ExitApplication, ModManager);
-            InfoDumper = new InfoDumper(SpecialFolders, DebugBridge, ModManager, _configManager, PatchingManager);
+            InfoDumper = new InfoDumper(SpecialFolders, DebugBridge, ModManager, Logger, _configManager, PatchingManager);
 
-            Log.Debug($"QuestPatcherService constructed (QuestPatcher version {VersionUtil.QuestPatcherVersion})");
+            Logger.Debug($"QuestPatcherService constructed (QuestPatcher version {VersionUtil.QuestPatcherVersion})");
         }
 
         private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
@@ -92,7 +92,7 @@ namespace QuestPatcher.Core
         /// </summary>
         public void CleanUp()
         {
-            Log.Debug("Closing QuestPatcher . . .");
+            Logger.Debug("Closing QuestPatcher . . .");
             _configManager.SaveConfig();
             try
             {
@@ -100,16 +100,16 @@ namespace QuestPatcher.Core
             }
             catch (Exception)
             {
-                Log.Warning("Failed to delete temporary directory");
+                Logger.Warning("Failed to delete temporary directory");
             }
-            Log.Debug("Goodbye!");
-            Log.CloseAndFlush();
+            Logger.Debug("Goodbye!");
+            Logger.Dispose();
         }
 
         protected async Task RunStartup()
         {
             HasLoaded = false;
-            Log.Information("Starting QuestPatcher . . .");
+            Logger.Information("Starting QuestPatcher . . .");
 
             if(!await DebugBridge.IsPackageInstalled(Config.AppId))
             {
@@ -122,9 +122,9 @@ namespace QuestPatcher.Core
                     ExitApplication();
                 }
             }
-            Log.Information("App is installed");
+            Logger.Information("App is installed");
 
-            MigrateOldFiles();
+            await MigrateOldFiles();
 
             await PatchingManager.LoadInstalledApp();
             await ModManager.LoadModsForCurrentApp();
@@ -135,9 +135,9 @@ namespace QuestPatcher.Core
         /// Migrates old mods and displays the migration prompt if there were mods to migrate.
         /// Also deletes the old platform-tools folder to save space, since this has now been moved.
         /// </summary>
-        private void MigrateOldFiles()
+        private async Task MigrateOldFiles()
         {
-            Log.Information("Deleting old files. . .");
+            Logger.Information("Deleting old files. . .");
             try
             {
                 string oldPlatformToolsPath = Path.Combine(SpecialFolders.DataFolder, "platform-tools");
@@ -164,7 +164,7 @@ namespace QuestPatcher.Core
             }
             catch (Exception ex)
             {
-                Log.Warning($"Failed to delete QP1 files: {ex}");
+                Logger.Warning($"Failed to delete QP1 files: {ex}");
             }
 
             // TODO: reimplement

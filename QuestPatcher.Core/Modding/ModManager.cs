@@ -2,14 +2,17 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using QuestPatcher.Core.Models;
-using Serilog;
+using Serilog.Core;
 
 namespace QuestPatcher.Core.Modding
 {
+    // TODO: Upgrade from old mod system
+    // TODO: And old old mod system notice
     public class ModManager
     {
         public ObservableCollection<IMod> Mods { get; } = new();
@@ -22,13 +25,13 @@ namespace QuestPatcher.Core.Modding
         public string LibsPath => $"/sdcard/Android/data/{_config.AppId}/files/libs/";
         
         private string ConfigPath => $"/sdcard/QuestPatcher/{_config.AppId}/modsStatus.json";
-        public string ModsExtractPath => $"/sdcard/QuestPatcher/{_config.AppId}/installedMods/";
+        private string ModsExtractPath => $"/sdcard/QuestPatcher/{_config.AppId}/installedMods/";
         
         private readonly Dictionary<string, IModProvider> _modProviders = new();
         private readonly ModConverter _modConverter = new();
         private readonly Config _config;
+        private readonly Logger _logger;
         private readonly AndroidDebugBridge _debugBridge;
-        private readonly OtherFilesManager _otherFilesManager;
         private readonly JsonSerializerOptions _configSerializationOptions = new()
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
@@ -37,14 +40,13 @@ namespace QuestPatcher.Core.Modding
 
         private ModConfig? _modConfig;
         private bool _awaitingConfigSave;
-        
 
-        public ModManager(Config config, AndroidDebugBridge debugBridge, OtherFilesManager otherFilesManager)
+        public ModManager(Config config, AndroidDebugBridge debugBridge, Logger logger)
         {
             _config = config;
             _debugBridge = debugBridge;
+            _logger = logger;
             _configSerializationOptions.Converters.Add(_modConverter);
-            _otherFilesManager = otherFilesManager;
         }
 
         private string NormalizeFileExtension(string extension)
@@ -109,20 +111,15 @@ namespace QuestPatcher.Core.Modding
             _awaitingConfigSave = false;
         }
 
-        public async Task CreateModDirectories()
-        {
-            await _debugBridge.CreateDirectories(new List<string> {ModsPath, LibsPath, ModsExtractPath});
-        }
-
         public async Task LoadModsForCurrentApp()
         {
-            Log.Information("Loading mods . . .");
-            await CreateModDirectories();
+            _logger.Information("Loading mods . . .");
+            await _debugBridge.CreateDirectories(new List<string> {ModsPath, LibsPath, ModsExtractPath});
 
             // If a config file exists, we'll need to load our mods from it
             if(await _debugBridge.FileExists(ConfigPath))
             {
-                Log.Debug("Loading mods from quest mod config");
+                _logger.Debug("Loading mods from quest mod config");
                 using TempFile configTemp = new();
                 await _debugBridge.DownloadFile(ConfigPath, configTemp.Path);
 
@@ -134,26 +131,20 @@ namespace QuestPatcher.Core.Modding
                     {
                         modConfig.Mods.ForEach(ModLoadedCallback);
                         _modConfig = modConfig;
-                        Log.Debug($"{AllMods.Count} mods loaded");
+                        _logger.Debug($"{AllMods.Count()} mods loaded");
                     }
                 }
                 catch(Exception ex)
                 {
-                    Log.Warning($"Failed to load mods from quest config: {ex}");
+                    _logger.Warning($"Failed to load mods from quest config: {ex}");
                 }
             }
             else
             {
-                Log.Debug("No mod status config found, attempting to load legacy mods");
-                
-                _modConfig = new();
-                foreach (var provider in _modProviders.Values)
-                {
-                    await provider.LoadLegacyMods();
-                }
-
-                await SaveMods();
+                _logger.Debug("No mod status config found, defaulting to no mods");
             }
+
+            _modConfig ??= new();
             
             foreach(IModProvider provider in _modProviders.Values)
             {
@@ -170,11 +161,11 @@ namespace QuestPatcher.Core.Modding
             
             if(_modConfig is null)
             {
-                Log.Warning("Could not save mods, mod config was null");
+                _logger.Warning("Could not save mods, mod config was null");
                 return;
             }
             
-            Log.Information($"Saving {AllMods.Count} mods . . .");
+            _logger.Information($"Saving {AllMods.Count} mods . . .");
             using TempFile configTemp = new();
             await using(Stream configStream = File.OpenWrite(configTemp.Path))
             {
@@ -189,20 +180,12 @@ namespace QuestPatcher.Core.Modding
         {
             (mod.IsLibrary ? Libraries : Mods).Add(mod);
             _modConfig?.Mods.Add(mod);
-            foreach (var copyType in mod.FileCopyTypes)
-            {
-                _otherFilesManager.RegisterFileCopy(_config.AppId, copyType);
-            }
             _awaitingConfigSave = true;
         }
         
         internal void ModRemovedCallback(IMod mod)
         {
             (mod.IsLibrary ? Libraries : Mods).Remove(mod);
-            foreach (var copyType in mod.FileCopyTypes)
-            {
-                _otherFilesManager.RemoveFileCopy(_config.AppId, copyType);
-            }
             _modConfig?.Mods.Remove(mod);
             _awaitingConfigSave = true;
         }

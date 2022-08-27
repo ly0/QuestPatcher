@@ -15,6 +15,5 @@ namespace QuestPatcher.Core.Modding
         public abstract Task DeleteMod(IMod mod);
         public abstract Task LoadMods();
         public abstract void ClearMods();
-        public abstract Task LoadLegacyMods();
     }
 }

@@ -35,11 +35,5 @@ namespace QuestPatcher.Core.Modding
         /// Clears currently loaded mods
         /// </summary>
         void ClearMods();
-
-        /// <summary>
-        /// Invoked if no mod config is found when loading mods.
-        /// Loads mods in an outdated format.
-        /// </summary>
-        Task LoadLegacyMods();
     }
 }

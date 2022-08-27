@@ -3,15 +3,17 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
-using QuestPatcher.Models;
+using QuestPatcher.Core;
 using QuestPatcher.Services;
 using QuestPatcher.Views;
-using Serilog;
+using Serilog.Core;
 
 namespace QuestPatcher
 {
     public class App : Application
     {
+        private Logger? _logger;
+        
         public override void Initialize()
         {
             AvaloniaXamlLoader.Load(this);
@@ -24,8 +26,8 @@ namespace QuestPatcher
                 return;
             }
             
-            Log.Error($"Unhandled exception, QuestPatcher quitting!: {args.ExceptionObject}");
-            Log.CloseAndFlush();
+            _logger?.Error($"Unhandled exception, QuestPatcher quitting!: {args.ExceptionObject}");
+            _logger?.Dispose(); // Flush logs
         }
 
         public override void OnFrameworkInitializationCompleted()
@@ -36,7 +38,9 @@ namespace QuestPatcher
                 
                 try
                 {
-                    var questPatcherService = new QuestPatcherUiService(desktop);
+                    QuestPatcherService questPatcherService = new QuestPatcherUIService(desktop);
+                    _logger = questPatcherService.Logger;
+                    
                     desktop.Exit += (_, _) =>
                     {
                         questPatcherService.CleanUp();
@@ -44,13 +48,6 @@ namespace QuestPatcher
                 }
                 catch (Exception ex)
                 {
-                    // Load the default dark theme if we crashed so early in startup that themes hadn't yet been loaded
-                    if(Styles.Count == 1)
-                    {
-                        Styles.Insert(0,
-                            Theme.LoadEmbeddedTheme("Styles/Themes/QuestPatcherDark.axaml", "Dark").ThemeStying);
-                    }
-
                     DialogBuilder dialog = new()
                     {
                         Title = "Critical Error",

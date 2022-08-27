@@ -8,7 +8,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using QuestPatcher.Core.Models;
 using QuestPatcher.QMod;
-using Serilog;
+using Serilog.Core;
 
 namespace QuestPatcher.Core.Modding
 {
@@ -22,13 +22,15 @@ namespace QuestPatcher.Core.Modding
 
         private readonly ModManager _modManager;
         private readonly Config _config;
+        private readonly Logger _logger;
         private readonly AndroidDebugBridge _debugBridge;
         private readonly ExternalFilesDownloader _filesDownloader;
 
-        public QModProvider(ModManager modManager, Config config, AndroidDebugBridge debugBridge, ExternalFilesDownloader filesDownloader)
+        public QModProvider(ModManager modManager, Config config, Logger logger, AndroidDebugBridge debugBridge, ExternalFilesDownloader filesDownloader)
         {
             _modManager = modManager;
             _config = config;
+            _logger = logger;
             _debugBridge = debugBridge;
             _filesDownloader = filesDownloader;
         }
@@ -49,13 +51,13 @@ namespace QuestPatcher.Core.Modding
             await using QMod.QMod qmod = await QMod.QMod.ParseAsync(modStream);
             
             // Check that the package ID is correct. We don't want people installing Beat Saber mods on Gorilla Tag!
-            Log.Information($"Mod ID: {qmod.Id}, Version: {qmod.Version}, Is Library: {qmod.IsLibrary}");
-            if (qmod.PackageId != null && qmod.PackageId != _config.AppId)
+            _logger.Information($"Mod ID: {qmod.Id}, Version: {qmod.Version}, Is Library: {qmod.IsLibrary}");
+            if (qmod.PackageId != _config.AppId)
             {
                 throw new InstallationException($"该Mod适用于{qmod.PackageId}，与你目前要Mod的应用{_config.AppId}不兼容。");
             }
             
-            var mod = new QPMod(this, qmod.GetManifest(), _debugBridge, _filesDownloader, _modManager);
+            QPMod mod = new(this, qmod.GetManifest(), _debugBridge, _logger, _filesDownloader, _modManager);
 
             // Check if upgrading from a previous version is OK, or if we have to fail the import
             ModsById.TryGetValue(qmod.Id, out QPMod? existingInstall);
@@ -63,7 +65,7 @@ namespace QuestPatcher.Core.Modding
             {
                 if (existingInstall.Version == qmod.Version)
                 {
-                    Log.Warning($"Version of existing {existingInstall.Id} is the same as the installing version ({mod.Version})");
+                    _logger.Warning($"Version of existing {existingInstall.Id} is the same as the installing version ({mod.Version})");
                 }
                 if (false&&existingInstall.Version > qmod.Version) // Agrees downgrade @MicroBlock
                 {
@@ -75,15 +77,15 @@ namespace QuestPatcher.Core.Modding
             
             string pushPath = Path.Combine("/data/local/tmp/", $"{qmod.Id}.temp.modextract");
             // Save the mod files to the quest for later installing
-            Log.Information("Pushing & extracting on to quest . . .");
+            _logger.Information("Pushing & extracting on to quest . . .");
             await _debugBridge.UploadFile(modPath, pushPath);
             await _debugBridge.ExtractArchive(pushPath, GetExtractDirectory(qmod.Id));
-            await _debugBridge.DeleteFile(pushPath);
+            await _debugBridge.RemoveFile(pushPath);
 
             AddMod(mod);
             _modManager.ModLoadedCallback(mod);
 
-            Log.Information("Import complete");
+            _logger.Information("Import complete");
             return mod;
         }
         
@@ -97,7 +99,7 @@ namespace QuestPatcher.Core.Modding
         private async Task PrepareVersionChange(QPMod currentlyInstalled, QPMod newVersion)
         {
             Debug.Assert(currentlyInstalled.Id == newVersion.Id);
-            Log.Information($"Attempting to upgrade {currentlyInstalled.Id} v{currentlyInstalled.Version} to {newVersion.Id} v{newVersion.Version}");
+            _logger.Information($"Attempting to upgrade {currentlyInstalled.Id} v{currentlyInstalled.Version} to {newVersion.Id} v{newVersion.Version}");
 
             bool didFailToMatch = false;
 
@@ -113,7 +115,7 @@ namespace QuestPatcher.Core.Modding
                         string errorLine = $"{mod.Id}需要{dependency.VersionRange}版本范围的{currentlyInstalled.Id}，然而正要更新的{currentlyInstalled.Id}在升级到{newVersion.Version}后将不属于兼容范围。";
                         errorBuilder.AppendLine(errorLine);
                         
-                        Log.Error(errorLine);
+                        _logger.Error(errorLine);
                         didFailToMatch = true;
                     }
                 }
@@ -125,7 +127,7 @@ namespace QuestPatcher.Core.Modding
             }
             else
             {
-                Log.Information($"Deleting old version of {newVersion.Id} to prepare for upgrade . . .");
+                _logger.Information($"Deleting old version of {newVersion.Id} to prepare for upgrade . . .");
                 await DeleteMod(currentlyInstalled);
             }
         }
@@ -148,11 +150,11 @@ namespace QuestPatcher.Core.Modding
             
             if(mod.IsInstalled)
             {
-                Log.Information($"Uninstalling mod {mod.Id} to prepare for removal . . .");
+                _logger.Information($"Uninstalling mod {mod.Id} to prepare for removal . . .");
                 await genericMod.Uninstall();
             }
             
-            Log.Information($"Removing mod {mod.Id} . . .");
+            _logger.Information($"Removing mod {mod.Id} . . .");
             await _debugBridge.RemoveDirectory(GetExtractDirectory(mod.Id));
 
             ModsById.Remove(mod.Id);
@@ -193,7 +195,7 @@ namespace QuestPatcher.Core.Modding
                 {
                     if (mod.IsInstalled)
                     {
-                        Log.Information($"{mod.Id} is unused - " + (onlyDisable ? "uninstalling" : "unloading"));
+                        _logger.Information($"{mod.Id} is unused - " + (onlyDisable ? "uninstalling" : "unloading"));
                         actionPerformed = true;
                         await mod.Uninstall();
                     }
@@ -213,7 +215,7 @@ namespace QuestPatcher.Core.Modding
             {
                 throw new NullReferenceException("Null manifest for mod");
             }
-            var mod = new QPMod(this, manifest, _debugBridge, _filesDownloader, _modManager);
+            QPMod mod = new(this, manifest, _debugBridge, _logger, _filesDownloader, _modManager);
             
             AddMod(mod);
             return mod;
@@ -249,27 +251,6 @@ namespace QuestPatcher.Core.Modding
         public override void ClearMods()
         {
             ModsById.Clear();
-        }
-        
-        public override async Task LoadLegacyMods()
-        {
-            var legacyFolders = await _debugBridge.ListDirectoryFolders(_modManager.ModsExtractPath);
-            Log.Information($"Attempting to load {legacyFolders.Count} legacy mods");
-            foreach(var legacyFolder in legacyFolders)
-            {
-                Log.Debug($"Loading legacy mod at {legacyFolder}");
-                var modJsonPath = Path.Combine(legacyFolder, "mod.json");
-                using var tmp = new TempFile();
-                await _debugBridge.DownloadFile(modJsonPath, tmp.Path);
-
-                await using var modJsonStream = File.OpenRead(tmp.Path);
-                var manifest = await QModManifest.ParseAsync(modJsonStream);
-                
-                var mod = new QPMod(this, manifest, _debugBridge, _filesDownloader, _modManager);
-                
-                AddMod(mod);
-                _modManager.ModLoadedCallback(mod);
-            }    
         }
     }
 }

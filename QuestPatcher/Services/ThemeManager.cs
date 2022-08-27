@@ -8,7 +8,6 @@ using QuestPatcher.Core;
 using QuestPatcher.Core.Models;
 using QuestPatcher.Models;
 using ReactiveUI;
-using Serilog;
 using Serilog.Core;
 
 namespace QuestPatcher.Services
@@ -43,17 +42,19 @@ namespace QuestPatcher.Services
         public List<Theme> AvailableThemes { get; } = new();
 
         private readonly Config _config;
+        private readonly Logger _logger;
 
-        public ThemeManager(Config config, SpecialFolders specialFolders)
+        public ThemeManager(Config config, SpecialFolders specialFolders, Logger logger)
         {
             _config = config;
+            _logger = logger;
             
             ThemesDirectory = Path.Combine(specialFolders.DataFolder, ThemesDirectoryName);
             Directory.CreateDirectory(ThemesDirectory);
             
             AddDefaultThemes();
             LoadCustomThemes();
-            Log.Debug($"{AvailableThemes.Count} themes loaded successfully!");
+            _logger.Debug($"{AvailableThemes.Count} themes loaded successfully!");
             
             // Default back to the dark theme if the selected theme was deleted
             _selectedTheme = AvailableThemes.FirstOrDefault(theme => theme.Name == config.SelectedThemeName) ?? AvailableThemes.Single(theme => theme.Name == "Dark");
@@ -62,7 +63,7 @@ namespace QuestPatcher.Services
 
         private void AddDefaultThemes()
         {
-            Log.Debug("Loading default themes");
+            _logger.Debug("Loading default themes");
             AvailableThemes.Add(Theme.LoadEmbeddedTheme("Styles/Themes/QuestPatcherDark.axaml", "Dark"));
             AvailableThemes.Add(Theme.LoadEmbeddedTheme("Styles/Themes/QuestPatcherLight.axaml", "Light"));
         }
@@ -74,7 +75,7 @@ namespace QuestPatcher.Services
 
             foreach(string themeDirName in Directory.EnumerateDirectories(ThemesDirectory))
             {
-                Log.Debug($"Loading theme from {themeDirName}");
+                _logger.Debug($"Loading theme from {themeDirName}");
                 try
                 {                
                     AvailableThemes.Add(Theme.LoadFromDirectory(themeDirName));
@@ -82,7 +83,7 @@ namespace QuestPatcher.Services
                 catch(Exception ex)
                 {
                     // TODO: Show an exception dialog instead of just logging?
-                    Log.Error($"Failed to load theme from {themeDirName}: {ex}");
+                    _logger.Error($"Failed to load theme from {themeDirName}: {ex}");
                 }
             }
         }

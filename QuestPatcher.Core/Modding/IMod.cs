@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -35,7 +34,7 @@ namespace QuestPatcher.Core.Modding
         /// <summary>
         /// Version of the package that the mod is intended for
         /// </summary>
-        string? PackageVersion { get; }
+        string PackageVersion { get; }
         
         /// <summary>
         /// Author of the mod
@@ -61,11 +60,6 @@ namespace QuestPatcher.Core.Modding
         /// Whether or not the mod is a library
         /// </summary>
         bool IsLibrary { get; }
-        
-        /// <summary>
-        /// The file types that this mod supports.
-        /// </summary>
-        IEnumerable<FileCopyType> FileCopyTypes { get; }
 
         /// <summary>
         /// Installs the mod
