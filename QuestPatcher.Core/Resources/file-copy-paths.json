@@ -103,6 +103,14 @@
       "supportedExtensions": [
         "box"
       ]
+    },
+    {
+      "path": "/sdcard/ModData/com.beatgames.beatsaber/Mods/Qosmetics/Whackers/",
+      "nameSingular": "Whacker",
+      "namePlural": "Whackers",
+      "supportedExtensions": [
+        "whacker"
+      ]
     }
   ]
 }
