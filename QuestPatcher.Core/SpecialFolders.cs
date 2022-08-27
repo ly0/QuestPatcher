@@ -54,19 +54,21 @@ namespace QuestPatcher.Core
             Directory.CreateDirectory(ToolsFolder);
 
             TempFolder = Path.Combine(Path.GetTempPath(), "QuestPatcher");
+            PatchingFolder = Path.Combine(TempFolder, "patching");
+            StagingArea = Path.Combine(TempFolder, "stagingArea");
+            
+            PatchingFolder = Path.Combine(TempFolder, "patching");
+            StagingArea = Path.Combine(TempFolder, "stagingArea");
+            
             if(Directory.Exists(TempFolder)) // Sometimes windows fails to delete this upon closing, and we have to do it ourselves
             {
                 Directory.Delete(TempFolder, true);
             }
             Directory.CreateDirectory(TempFolder);
-
-            PatchingFolder = Path.Combine(TempFolder, "patching");
             Directory.CreateDirectory(PatchingFolder);
-
-            StagingArea = Path.Combine(TempFolder, "stagingArea");
             Directory.CreateDirectory(StagingArea);
         }
-
+        
         /// <summary>
         /// Finds a path to write a file to before using ADB to push it
         /// </summary>
