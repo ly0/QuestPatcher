@@ -55,7 +55,7 @@ namespace QuestPatcher.Services
             window.Height = 550;
             _operationLocker = new();
             _operationLocker.StartOperation(); // Still loading
-            _browseManager = new(OtherFilesManager, ModManager, window, Logger, PatchingManager, _operationLocker,SpecialFolders,this);
+            _browseManager = new(OtherFilesManager, ModManager, window, Logger, PatchingManager, _operationLocker, SpecialFolders, this);
             ProgressViewModel progressViewModel = new(_operationLocker, FilesDownloader);
             _otherItemsView = new OtherItemsViewModel(OtherFilesManager, window, Logger, _browseManager, _operationLocker, progressViewModel);
             loadedView = new LoadedViewModel(
@@ -63,7 +63,7 @@ namespace QuestPatcher.Services
                     new ManageModsViewModel(ModManager, PatchingManager, window, _operationLocker, progressViewModel, _browseManager),
                     _loggingViewModel,
                     new ToolsViewModel(Config, progressViewModel, _operationLocker, window, SpecialFolders, Logger, PatchingManager, DebugBridge, this, InfoDumper,
-                        _themeManager,_browseManager),
+                        _themeManager, _browseManager),
                     _otherItemsView,
                     Config,
                     PatchingManager,
@@ -85,7 +85,7 @@ namespace QuestPatcher.Services
         private async Task LoadAndHandleErrors()
         {
             Debug.Assert(_operationLocker != null); // Main window has been loaded, so this is assigned
-            if (_operationLocker.IsFree) // Necessary since the operation may have started earlier if this is the first load. Otherwise, we need to start the operation on subsequent loads
+            if(_operationLocker.IsFree) // Necessary since the operation may have started earlier if this is the first load. Otherwise, we need to start the operation on subsequent loads
             {
                 _operationLocker.StartOperation();
             }
@@ -96,9 +96,10 @@ namespace QuestPatcher.Services
                 // So instead, we refresh the currently selected file copy after starting, if there is one
                 _otherItemsView?.RefreshFiles();
             }
-            catch (Exception ex)
+            catch(Exception ex)
             {
-                if(ex.ToString().Contains("___flag_beatsaber_not_exists___")) {
+                if(ex.ToString().Contains("___flag_beatsaber_not_exists___"))
+                {
                     DialogBuilder builder1 = new()
                     {
                         Title = "尚未安装BeatSaber",
@@ -106,11 +107,12 @@ namespace QuestPatcher.Services
                         HideCancelButton = true
                     };
                     builder1.OkButton.ReturnValue = false;
-                    builder1.WithButtons(new ButtonInfo{
+                    builder1.WithButtons(new ButtonInfo
+                    {
                         Text = "安装APK",
                         OnClick = async () =>
                         {
-                           await _browseManager.askToInstall();
+                            await _browseManager.askToInstall();
                         }
                     });
                     await builder1.OpenDialogue(_mainWindow);
@@ -128,37 +130,37 @@ namespace QuestPatcher.Services
                         HideCancelButton = true
                     };
                     builder1.OkButton.ReturnValue = false;
-                    builder1.WithButtons( new ButtonInfo
-                {
-                    Text = "购买正版",
-                    CloseDialogue = false,
-                    ReturnValue = false,
-                    OnClick = async () =>
+                    builder1.WithButtons(new ButtonInfo
                     {
-                        ProcessStartInfo psi = new()
+                        Text = "购买正版",
+                        CloseDialogue = false,
+                        ReturnValue = false,
+                        OnClick = async () =>
                         {
-                            FileName = "https://www.oculus.com/experiences/quest/2448060205267927",
-                            UseShellExecute = true
-                        };
-                        Process.Start(psi);
-                    }
-                }, new ButtonInfo
-                {
-                    Text = "卸载当前版本",
-                    CloseDialogue = true,
-                    ReturnValue = true,
-                    OnClick = async () =>
+                            ProcessStartInfo psi = new()
+                            {
+                                FileName = "https://www.oculus.com/experiences/quest/2448060205267927",
+                                UseShellExecute = true
+                            };
+                            Process.Start(psi);
+                        }
+                    }, new ButtonInfo
                     {
-                        await PatchingManager.Uninstall();
+                        Text = "卸载当前版本",
+                        CloseDialogue = true,
+                        ReturnValue = true,
+                        OnClick = async () =>
+                        {
+                            await PatchingManager.Uninstall();
+                        }
                     }
-                }
             );
                     await builder1.OpenDialogue(_mainWindow);
                     ExitApplication();
                     return;
                 }
 
-                
+
                 if(ex.ToString().Contains("___flag_beatsaber_cracked_version___"))
                 {
                     ProcessStartInfo psi = new()
@@ -192,14 +194,14 @@ namespace QuestPatcher.Services
                     }
                 }, new ButtonInfo
                 {
-                    Text = "购买正版",
+                    Text = "如何购买正版？",
                     CloseDialogue = false,
                     ReturnValue = false,
                     OnClick = async () =>
                     {
                         ProcessStartInfo psi = new()
                         {
-                            FileName = "https://www.oculus.com/experiences/quest/2448060205267927",
+                            FileName = "https://bs.wgzeyu.com/buy/index.php?page=index#bs_quest",
                             UseShellExecute = true
                         };
                         Process.Start(psi);
@@ -219,9 +221,9 @@ namespace QuestPatcher.Services
                     ExitApplication();
                     return;
                 }
-                
 
-               DialogBuilder builder = new()
+
+                DialogBuilder builder = new()
                 {
                     Title = "Unhandled Load Error",
                     Text = "An error occured while loading",
@@ -243,12 +245,13 @@ namespace QuestPatcher.Services
                 );
 
                 // If the user did not select to change app, or closed the dialogue, we exit due to the error
-                if (!await builder.OpenDialogue(_mainWindow))
+                if(!await builder.OpenDialogue(_mainWindow))
                 {
                     Logger.Error($"Exiting QuestPatcher due to unhandled load error: {ex}");
                     ExitApplication();
                 }
-            }   finally
+            }
+            finally
             {
                 _operationLocker.FinishOperation();
             }
@@ -259,7 +262,7 @@ namespace QuestPatcher.Services
             Debug.Assert(_operationLocker != null);
 
             // Avoid showing this prompt if not in an operation, or if we are closing the window from exiting the application
-            if (_operationLocker.IsFree || _isShuttingDown) return;
+            if(_operationLocker.IsFree || _isShuttingDown) return;
 
             // Closing while operations are in progress is a bad idea, so we warn the user
             // We must set this to true at first, even if the user might press OK later.
@@ -273,7 +276,7 @@ namespace QuestPatcher.Services
             builder.OkButton.Text = "强制关闭";
 
             // Now we can exit the application if the user decides to
-            if (await builder.OpenDialogue(_mainWindow))
+            if(await builder.OpenDialogue(_mainWindow))
             {
                 ExitApplication();
             }
@@ -302,7 +305,7 @@ namespace QuestPatcher.Services
 
         public async Task Reload()
         {
-            if (_loggingViewModel != null)
+            if(_loggingViewModel != null)
             {
                 _loggingViewModel.LoggedText = ""; // Avoid confusing people by not showing existing logs
             }
@@ -320,7 +323,7 @@ namespace QuestPatcher.Services
                 .WriteTo.Sink(
                 new StringDelegateSink(str =>
                 {
-                    if (_loggingViewModel != null)
+                    if(_loggingViewModel != null)
                     {
                         _loggingViewModel.LoggedText += str + "\n";
                     }

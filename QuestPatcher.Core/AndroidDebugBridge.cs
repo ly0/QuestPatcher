@@ -84,7 +84,7 @@ namespace QuestPatcher.Core
         {
             try
             {
-                await ProcessUtil.InvokeAndCaptureOutput(_adbExecutableName, "-version");
+                var output = await ProcessUtil.InvokeAndCaptureOutput(_adbExecutableName, "-version");
                 // If the ADB EXE is already on PATH, we can just use that
                 _adbPath = _adbExecutableName;
                 _logger.Information("Located ADB install on PATH");
