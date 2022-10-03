@@ -8,6 +8,7 @@ using System.IO;
 using System.Threading.Tasks;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace QuestPatcher.Core
 {
@@ -84,10 +85,48 @@ namespace QuestPatcher.Core
         {
             try
             {
-                var output = await ProcessUtil.InvokeAndCaptureOutput(_adbExecutableName, "-version");
-                // If the ADB EXE is already on PATH, we can just use that
-                _adbPath = _adbExecutableName;
-                _logger.Information("Located ADB install on PATH");
+                var output = await ProcessUtil.InvokeAndCaptureOutput(_adbExecutableName, "version");
+
+                string? bridgeVersion = null, version = null;
+
+                {
+                    string pattern = @"Debug Bridge version (\S+)";
+
+                    Match match = Regex.Match(output.AllOutput, pattern);
+                    if(match.Success)
+                    {
+                        Group g = match.Groups[1];
+                        bridgeVersion = g.ToString();
+                    }
+                }
+
+                {
+                    string pattern = @"Version (\S+)";
+
+                    Match match = Regex.Match(output.AllOutput, pattern);
+                    if(match.Success)
+                    {
+                        Group g = match.Groups[0];
+                        version = g.ToString();
+                    }
+                }
+
+                if(bridgeVersion != null && version != null)
+                {
+                    var bridgeVersionSplited = bridgeVersion.Trim().Split(".");
+                    if(int.Parse(bridgeVersionSplited[0]) > 1 ||
+                        (int.Parse(bridgeVersionSplited[0]) == 1 &&
+                        int.Parse(bridgeVersionSplited[2]) > 36))
+                    {
+
+                        _adbPath = _adbExecutableName;
+                        _logger.Information("Located ADB install on PATH");
+                    }
+                    else
+                    {
+                        _adbPath = await _filesDownloader.GetFileLocation(ExternalFileType.PlatformTools);
+                    }
+                }
             }
             catch(Win32Exception) // Thrown if the file we attempted to execute does not exist (on mac & linux as well, despite saying Win32)
             {
