@@ -201,7 +201,7 @@ namespace QuestPatcher.Services
                     {
                         ProcessStartInfo psi = new()
                         {
-                            FileName = "https://bs.wgzeyu.com/buy/index.php?page=index#bs_quest",
+                            FileName = "https://bs.wgzeyu.com/buy/#bs_quest",
                             UseShellExecute = true
                         };
                         Process.Start(psi);
