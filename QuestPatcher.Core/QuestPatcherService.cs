@@ -48,9 +48,9 @@ namespace QuestPatcher.Core
             FilesDownloader = new ExternalFilesDownloader(SpecialFolders, Logger);
             DebugBridge = new AndroidDebugBridge(Logger, FilesDownloader, OnAdbDisconnect);
             PatchingManager = new PatchingManager(Logger, Config, DebugBridge, SpecialFolders, FilesDownloader, Prompter, new ApkSigner(), ExitApplication);
-            ModManager = new ModManager(Config, DebugBridge, Logger);
-            ModManager.RegisterModProvider(new QModProvider(ModManager, Config, Logger, DebugBridge, FilesDownloader));
             OtherFilesManager = new OtherFilesManager(Config, DebugBridge);
+            ModManager = new ModManager(Config, DebugBridge, Logger, OtherFilesManager);
+            ModManager.RegisterModProvider(new QModProvider(ModManager, Config, Logger, DebugBridge, FilesDownloader));
             InfoDumper = new InfoDumper(SpecialFolders, DebugBridge, ModManager, Logger, _configManager, PatchingManager);
 
             Logger.Debug($"QuestPatcherService constructed (QuestPatcher version {VersionUtil.QuestPatcherVersion})");
