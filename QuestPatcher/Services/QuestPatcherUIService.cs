@@ -169,12 +169,12 @@ namespace QuestPatcher.Services
                         UseShellExecute = true
                     };
                     Process.Start(psi);
-                    ProcessStartInfo psi = new()
+                    ProcessStartInfo psi2 = new()
                     {
                         FileName = "https://bs.wgzeyu.com/buy/#bs_quest",
                         UseShellExecute = true
                     };
-                    Process.Start(psi);
+                    Process.Start(psi2);
                     DialogBuilder builder1 = new()
                     {
                         Title = "非原版BeatSaber！",
