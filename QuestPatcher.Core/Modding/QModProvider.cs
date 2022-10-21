@@ -112,7 +112,7 @@ namespace QuestPatcher.Core.Modding
                 {
                     if (dependency.Id == currentlyInstalled.Id && !dependency.VersionRange.IsSatisfied(newVersion.Version))
                     {
-                        string errorLine = $"{mod.Id}需要{dependency.VersionRange}版本范围的{currentlyInstalled.Id}，然而正要安装的{currentlyInstalled.Id}在升级到{newVersion.Version}后将不属于兼容范围。如果您非常需要安装{currentlyInstalled.Id}，可以尝试先卸掉{mod.Id}后再进行安装。";
+                        string errorLine = $"{mod.Id}依赖于{dependency.VersionRange}版本范围的{currentlyInstalled.Id}，然而正要安装的{currentlyInstalled.Id}在升级到{newVersion.Version}后将不再属于该范围，无法兼容{mod.Id}。 如果您非常需要安装{currentlyInstalled.Id}，可以尝试先卸掉{mod.Id}后再进行安装。";
                         errorBuilder.AppendLine(errorLine);
                         
                         _logger.Error(errorLine);
