@@ -28,7 +28,7 @@
         "linux": "https://mirrors.tuna.tsinghua.edu.cn/AdoptOpenJDK/11/jdk/x64/linux/OpenJDK11U-jdk_x64_linux_hotspot_11.0.13_8.tar.gz"
       },
       "OvrPlatformSdk": {
-        "any": "https://securecdn.oculus.com/binaries/download/?id=1180710875385946&access_token=OC%7C1196467420370658%7C"
+        "any": "https://bs.wgzeyu.com/speedlimit/qpfile/OVRPlatformSDK_v1.36.0.zip"
       }
     }
   }
