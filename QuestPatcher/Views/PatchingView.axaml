@@ -26,7 +26,7 @@
             </ComboBox>
           </StackPanel>
         </StackPanel>
-        <ToggleButton IsChecked="{Binding Config.ShowPatchingOptions}" VerticalAlignment="Top" HorizontalAlignment="Right">Customise Permissions</ToggleButton>
+        <ToggleButton IsChecked="{Binding Config.ShowPatchingOptions}" VerticalAlignment="Top" HorizontalAlignment="Right">高级设置</ToggleButton>
       </Panel>
         
       <StackPanel HorizontalAlignment="Center" Orientation="Vertical" VerticalAlignment="Center" Spacing="20">
