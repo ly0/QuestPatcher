@@ -11,6 +11,8 @@ namespace QuestPatcher.Core
 
         Task<bool> PromptUnstrippedUnityUnavailable();
 
+        Task<bool> PromptFlatScreenWarning();
+
         Task<bool> Prompt32Bit();
 
         Task<bool> PromptPauseBeforeCompile();
