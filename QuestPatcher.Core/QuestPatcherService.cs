@@ -43,6 +43,7 @@ namespace QuestPatcher.Core
             Log.Logger = SetupLogging();
 
             Prompter = prompter;
+            Prompter.CheckUpdate();
             _configManager = new ConfigManager(SpecialFolders);
             _configManager.GetOrLoadConfig(); // Load the config file
             FilesDownloader = new ExternalFilesDownloader(SpecialFolders);
@@ -67,9 +68,7 @@ namespace QuestPatcher.Core
         /// </summary>
         private Logger SetupLogging()
         {
-            Prompter.CheckUpdate();
             LoggerConfiguration configuration = new();
-                    
             SetLoggingOptions(configuration);
             return configuration.CreateLogger();
         }
