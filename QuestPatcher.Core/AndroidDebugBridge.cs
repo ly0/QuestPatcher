@@ -269,8 +269,9 @@ namespace QuestPatcher.Core
 
         public async Task InstallApp(string apkPath)
         {
-            await RunCommand($"push \"{apkPath.EscapeProc()}\" /data/local/tmp/tmp.apk");
-            await RunCommand($"shell pm install /data/local/tmp/tmp.apk");
+            const string destApkPath = @"/data/local/tmp/tmp.apk";
+            await UploadFile(apkPath, destApkPath);
+            await RunCommand($"shell pm install {destApkPath}");
         }
 
         public async Task CreateDirectory(string path)
