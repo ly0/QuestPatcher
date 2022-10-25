@@ -555,7 +555,7 @@ namespace QuestPatcher
                 {
                     Title = "未找到该版本的核心Mod！",
                     Text = $"你当前安装的游戏版本为{_patchingManager.InstalledApp.Version}，但核心Mod还没有更新、还没有适配该版本，所以无法安装核心Mod。\n" +
-                    $"你可以先降级游戏再重新打补丁装Mod。\n若需降级请查看泽宇教程"
+                    $"你可以先降级游戏再重新打补丁装Mod。\n如需降级请查看新手教程左下角"
                 };
                 if(manualCheck)builder.HideOkButton=true;
                 builder.OkButton.Text = "仍然安装";
@@ -563,7 +563,7 @@ namespace QuestPatcher
                 builder.WithButtons(
                 new ButtonInfo
                 {
-                    Text = "进入泽宇教程",
+                    Text = "进入新手教程",
                     CloseDialogue = true,
                     ReturnValue = true,
                     OnClick = async () =>

@@ -58,14 +58,14 @@ namespace QuestPatcher
                     builder.WithButtons(
                          new ButtonInfo
                          {
-                             Text = "进入泽宇教程",
+                             Text = "进入QP教程",
                              CloseDialogue = true,
                              ReturnValue = true,
                              OnClick = async () =>
                              {
                                  ProcessStartInfo psi = new()
                                  {
-                                     FileName = "https://bs.wgzeyu.com/oq-guide-qp/",
+                                     FileName = "https://bs.wgzeyu.com/oq-guide-qp/#install_qp",
                                      UseShellExecute = true
                                  };
                                  Process.Start(psi);
@@ -73,14 +73,14 @@ namespace QuestPatcher
                          },
                     new ButtonInfo
                     {
-                        Text = "进入泽宇网盘",
+                        Text = "进入网盘下载",
                         CloseDialogue = true,
                         ReturnValue = true,
                         OnClick = async () =>
                         {
                             ProcessStartInfo psi = new()
                             {
-                                FileName = "http://share.wgzeyu.vip",
+                                FileName = "http://share.wgzeyu.vip/?Ly8lRTUlQjclQTUlRTUlODUlQjclRUYlQkMlODglRTUlQTYlODJNb2QlRTUlQUUlODklRTglQTMlODUlRTUlOTklQTglRTMlODAlODElRTglQjAlQjElRTklOUQlQTIlRTclQkMlOTYlRTglQkUlOTElRTUlOTklQTglRTclQUQlODlCUyVFNyU5QiVCOCVFNSU4NSVCMyVFOCVCRCVBRiVFNCVCQiVCNiVFRiVCQyU4OS8=",
                                 UseShellExecute = true
                             };
                             Process.Start(psi);
@@ -88,7 +88,7 @@ namespace QuestPatcher
                     },
                     new ButtonInfo
                     {
-                        Text = "进入开源页面Release",
+                        Text = "进入GitHub下载",
                         CloseDialogue = true,
                         ReturnValue = true,
                         OnClick = async () =>
@@ -120,14 +120,14 @@ namespace QuestPatcher
                 builder.WithButtons(
                     new ButtonInfo
                     {
-                        Text = "进入泽宇教程",
+                        Text = "进入QP教程",
                         CloseDialogue = true,
                         ReturnValue = true,
                         OnClick = async () =>
                         {
                             ProcessStartInfo psi = new()
                             {
-                                FileName = "https://bs.wgzeyu.com/oq-guide-qp/",
+                                FileName = "https://bs.wgzeyu.com/oq-guide-qp/#install_qp",
                                 UseShellExecute = true
                             };
                             Process.Start(psi);
@@ -135,14 +135,14 @@ namespace QuestPatcher
                     },
                     new ButtonInfo
                     {
-                        Text = "进入泽宇网盘",
+                        Text = "进入网盘下载",
                         CloseDialogue = true,
                         ReturnValue = true,
                         OnClick = async () =>
                         {
                             ProcessStartInfo psi = new()
                             {
-                                FileName = "http://share.wgzeyu.vip",
+                                FileName = "http://share.wgzeyu.vip/?Ly8lRTUlQjclQTUlRTUlODUlQjclRUYlQkMlODglRTUlQTYlODJNb2QlRTUlQUUlODklRTglQTMlODUlRTUlOTklQTglRTMlODAlODElRTglQjAlQjElRTklOUQlQTIlRTclQkMlOTYlRTglQkUlOTElRTUlOTklQTglRTclQUQlODlCUyVFNyU5QiVCOCVFNSU4NSVCMyVFOCVCRCVBRiVFNCVCQiVCNiVFRiVCQyU4OS8=",
                                 UseShellExecute = true
                             };
                             Process.Start(psi);
@@ -150,7 +150,7 @@ namespace QuestPatcher
                     },
                     new ButtonInfo
                     {
-                        Text = "进入开源页面Release",
+                        Text = "进入GitHub下载",
                         CloseDialogue = true,
                         ReturnValue = true,
                         OnClick = async () =>
@@ -211,7 +211,7 @@ namespace QuestPatcher
                     builder.WithButtons(
                         new ButtonInfo
                         {
-                            Text = "BS 泽宇教程",
+                            Text = "BeatSaber新手教程",
                             OnClick = () =>
                             {
                                 ProcessStartInfo psi = new()
