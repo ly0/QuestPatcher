@@ -15,7 +15,7 @@
       <ExperimentalAcrylicBorder DockPanel.Dock="Left" Width="240" Material="{DynamicResource MainBackgroundMaterial}">
         <StackPanel Orientation="Vertical" Margin="10 30 10 10" Spacing="3">
           <TextBlock TextAlignment="Center" Text="{Binding WelcomeText}" />
-          <TextBlock TextAlignment="Center" Text="Modified by MicroBlock &amp; WGzeyu" FontSize="10" TextTrimming="CharacterEllipsis"/>
+          <TextBlock TextAlignment="Center" Text="Modified by MicroBlock &amp; SkyQe &amp; WGzeyu" FontSize="10" TextTrimming="CharacterEllipsis"/>
         </StackPanel>
     </ExperimentalAcrylicBorder>
         
