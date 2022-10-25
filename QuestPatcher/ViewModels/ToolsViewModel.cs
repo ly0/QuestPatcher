@@ -2,7 +2,6 @@
 using QuestPatcher.Models;
 using QuestPatcher.Services;
 using QuestPatcher.Views;
-using Serilog.Core;
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -10,6 +9,7 @@ using ReactiveUI;
 using QuestPatcher.Core;
 using QuestPatcher.Core.Models;
 using QuestPatcher.Core.Patching;
+using Serilog;
 
 namespace QuestPatcher.ViewModels
 {
@@ -30,16 +30,15 @@ namespace QuestPatcher.ViewModels
 
         private readonly Window _mainWindow;
         private readonly SpecialFolders _specialFolders;
-        private readonly Logger _logger;
         private readonly PatchingManager _patchingManager;
         private readonly AndroidDebugBridge _debugBridge;
-        private readonly QuestPatcherUIService _uiService;
+        private readonly QuestPatcherUiService _uiService;
         private readonly InfoDumper _dumper;
         private readonly BrowseImportManager _browseManager;
 
         public ToolsViewModel(Config config, ProgressViewModel progressView, OperationLocker locker, 
-            Window mainWindow, SpecialFolders specialFolders, Logger logger, PatchingManager patchingManager, 
-            AndroidDebugBridge debugBridge, QuestPatcherUIService uiService, InfoDumper dumper, ThemeManager themeManager,BrowseImportManager browseManager)
+            Window mainWindow, SpecialFolders specialFolders, PatchingManager patchingManager, 
+            AndroidDebugBridge debugBridge, QuestPatcherUiService uiService, InfoDumper dumper, ThemeManager themeManager,BrowseImportManager browseManager)
         {
             Config = config;
             ProgressView = progressView;
@@ -49,7 +48,6 @@ namespace QuestPatcher.ViewModels
 
             _mainWindow = mainWindow;
             _specialFolders = specialFolders;
-            _logger = logger;
             _patchingManager = patchingManager;
             _debugBridge = debugBridge;
             _uiService = uiService;
@@ -57,7 +55,7 @@ namespace QuestPatcher.ViewModels
 
             _debugBridge.StoppedLogging += (_, _) =>
             {
-                _logger.Information("ADB log exited");
+                Log.Information("ADB log exited");
                 _isAdbLogging = false;
                 this.RaisePropertyChanged(nameof(AdbButtonText));
             };
@@ -88,7 +86,7 @@ namespace QuestPatcher.ViewModels
                     Locker.StartOperation();
                     try
                     {
-                        _logger.Information("正在卸载 . . .");
+                        Log.Information("正在卸载 . . .");
                         await _patchingManager.UninstallCurrentApp();
                     }
                     finally
@@ -99,7 +97,7 @@ namespace QuestPatcher.ViewModels
             }
             catch (Exception ex)
             {
-                _logger.Error($"卸载 {ex} 失败！");
+                Log.Error($"卸载 {ex} 失败！");
             }
         }
 
@@ -119,11 +117,11 @@ namespace QuestPatcher.ViewModels
             try
             {
                 await _uiService.QuickFix();
-                _logger.Information("Done!");
+                Log.Information("Done!");
             }
             catch (Exception ex)
             {
-                _logger.Error($"Failed to clear cache: {ex}");
+                Log.Error($"Failed to clear cache: {ex}");
                 DialogBuilder builder = new()
                 {
                     Title = "Failed to clear cache",
@@ -147,7 +145,7 @@ namespace QuestPatcher.ViewModels
             }
             else
             {
-                _logger.Information("Starting ADB log");
+                Log.Information("Starting ADB log");
                 await _debugBridge.StartLogging(Path.Combine(_specialFolders.LogsFolder, "adb.log"));
 
                 _isAdbLogging = true;
@@ -178,7 +176,7 @@ namespace QuestPatcher.ViewModels
             catch (Exception ex)
             {
                 // Show a dialog with any errors
-                _logger.Error($"Failed to create dump: {ex}");
+                Log.Error($"Failed to create dump: {ex}");
                 DialogBuilder builder = new()
                 {
                     Title = "Failed to create dump",

@@ -11,6 +11,7 @@ using Serilog.Core;
 using System.Linq;
 using QuestPatcher.Views;
 using System.Net;
+using Serilog;
 
 namespace QuestPatcher.ViewModels
 {
@@ -99,9 +100,8 @@ namespace QuestPatcher.ViewModels
 
         private readonly PatchingManager _patchingManager;
         private readonly BrowseImportManager _browseManager;
-        private readonly Logger _logger;
 
-        public LoadedViewModel(PatchingViewModel patchingView, ManageModsViewModel manageModsView, LoggingViewModel loggingView, ToolsViewModel toolsView, OtherItemsViewModel otherItemsView, Config config, PatchingManager patchingManager, BrowseImportManager browseManager, Logger logger)
+        public LoadedViewModel(PatchingViewModel patchingView, ManageModsViewModel manageModsView, LoggingViewModel loggingView, ToolsViewModel toolsView, OtherItemsViewModel otherItemsView, Config config, PatchingManager patchingManager, BrowseImportManager browseManager)
         {
             PatchingView = patchingView;
             LoggingView = loggingView;
@@ -112,7 +112,6 @@ namespace QuestPatcher.ViewModels
             Config = config;
             _patchingManager = patchingManager;
             _browseManager = browseManager;
-            _logger = logger;
 
             _patchingManager.PropertyChanged += (_, args) =>
             {
@@ -126,7 +125,7 @@ namespace QuestPatcher.ViewModels
 
         public async void OnDragAndDrop(object? sender, DragEventArgs args)
         {
-            _logger.Debug("Handling drag and drop on LoadedViewModel");
+            Log.Debug("Handling drag and drop on LoadedViewModel");
 
             // Sometimes a COMException gets thrown if the items can't be parsed for whatever reason.
             // We need to handle this to avoid crashing QuestPatcher.
@@ -135,16 +134,16 @@ namespace QuestPatcher.ViewModels
                 IEnumerable<string>? fileNames = args.Data.GetFileNames();
                 if (fileNames == null) // Non-file items dragged
                 {
-                    _logger.Debug("Drag and drop contained no file names");
+                    Log.Debug("Drag and drop contained no file names");
                     return;
                 }
 
-                _logger.Debug("Files found in drag and drop. Processing . . .");
+                Log.Debug("Files found in drag and drop. Processing . . .");
                 await _browseManager.AttemptImportFiles(fileNames.ToList(), OtherItemsView.SelectedFileCopy);
             }
             catch (COMException)
             {
-                _logger.Error("Failed to parse dragged items");
+                Log.Error("Failed to parse dragged items");
             }
         }
     }

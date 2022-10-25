@@ -16,14 +16,14 @@ namespace QuestPatcher
     {
         private Window? _mainWindow;
         private Config? _config;
-        private QuestPatcherUIService? _uiService;
+        private QuestPatcherUiService? _uiService;
         private SpecialFolders? _specialFolders;
 
         /// <summary>
         /// This exists instead of a constructor since the prompter must be immediately passed on QuestPatcherService's creation, so we initialise its members after the fact.
         /// Maybe there's a better workaround, but this works fine for now
         /// </summary>
-        public void Init(Window mainWindow, Config config, QuestPatcherUIService uiService, SpecialFolders specialFolders)
+        public void Init(Window mainWindow, Config config, QuestPatcherUiService uiService, SpecialFolders specialFolders)
         {
             _mainWindow = mainWindow;
             _config = config;
@@ -254,6 +254,18 @@ namespace QuestPatcher
                 default:
                     throw new NotImplementedException($"Variant {type} has no fallback/dialogue box");
             }
+
+            return builder.OpenDialogue(_mainWindow);
+        }
+        
+        public Task<bool> PromptFlatScreenWarning()
+        {
+            DialogBuilder builder = new()
+            {
+                Title = "禁用VR要求已启用",
+                Text = "您在高级选项中禁用了VR要求，这可能会导致出现错误，例如启动游戏时无限加载"
+            };
+            builder.OkButton.Text = "仍然继续";
 
             return builder.OpenDialogue(_mainWindow);
         }

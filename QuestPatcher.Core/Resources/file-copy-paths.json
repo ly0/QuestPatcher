@@ -84,33 +84,25 @@
       "path": "/sdcard/ModData/com.beatgames.beatsaber/Mods/CustomPillows/constellations/",
       "nameSingular": "枕头形状",
       "namePlural": "枕头形状",
-      "supportedExtensions": [
-        "json"
-      ]
-    },
-    {
-      "path": "/sdcard/ModData/com.beatgames.beatsaber/Mods/Qosmetics/Cyoobs/",
-      "nameSingular": "Cyoob",
-      "namePlural": "Cyoobs",
-      "supportedExtensions": [
-        "cyoob"
-      ]
-    },
-    {
-      "path": "/sdcard/ModData/com.beatgames.beatsaber/Mods/Qosmetics/Boxes/",
-      "nameSingular": "Box",
-      "namePlural": "Boxes",
-      "supportedExtensions": [
-        "box"
-      ]
+      "supportedExtensions": [ "json" ]
     },
     {
       "path": "/sdcard/ModData/com.beatgames.beatsaber/Mods/Qosmetics/Whackers/",
-      "nameSingular": "Whacker",
-      "namePlural": "Whackers",
-      "supportedExtensions": [
-        "whacker"
-      ]
+      "nameSingular": "光剑（新版）",
+      "namePlural": "光剑（新版）",
+      "supportedExtensions": [ "whacker" ]
+    },
+    {
+      "path": "/sdcard/ModData/com.beatgames.beatsaber/Mods/Qosmetics/Cyoobs/",
+      "nameSingular": "方块（新版）",
+      "namePlural": "方块（新版）",
+      "supportedExtensions": [ "cyoob" ]
+    },
+    {
+      "path": "/sdcard/ModData/com.beatgames.beatsaber/Mods/Qosmetics/Boxes/",
+      "nameSingular": "墙壁（新版）",
+      "namePlural": "墙壁（新版）",
+      "supportedExtensions": [ "box" ]
     }
   ]
 }
