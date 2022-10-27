@@ -14,6 +14,7 @@ using System.Net;
 using QuestPatcher.Core;
 using QuestPatcher.Services;
 using Avalonia.Media;
+using QuestPatcher.Core.Utils;
 using Serilog;
 
 namespace QuestPatcher
@@ -35,11 +36,9 @@ namespace QuestPatcher
         private readonly Window _mainWindow;
         private readonly PatchingManager _patchingManager;
         private readonly OperationLocker _locker;
-        private readonly JObject _coremods;
         private readonly SpecialFolders _specialFolders;
         private readonly FileDialogFilter _modsFilter = new();
         private readonly QuestPatcherUiService _uiService;
-        private readonly LoadedView _loaded;
         private Queue<FileImportInfo>? _currentImportQueue;
 
         public BrowseImportManager(OtherFilesManager otherFilesManager, ModManager modManager, Window mainWindow, PatchingManager patchingManager, OperationLocker locker,SpecialFolders specialFolders, QuestPatcherUiService uiService)
@@ -51,8 +50,6 @@ namespace QuestPatcher
             _mainWindow = mainWindow;
             _patchingManager = patchingManager;
             _locker = locker;
-            WebClient client = new();
-            _coremods = JObject.Parse(client.DownloadString("https://beatmods.wgzeyu.com/github/BMBFresources/com.beatgames.beatsaber/core-mods.json"));
             _modsFilter.Name = "Quest Mods";
             _modsFilter.Extensions.Add("qmod");
         }
@@ -490,23 +487,27 @@ namespace QuestPatcher
                 }
                 await client.DownloadFileTaskAsync(modUrl, _specialFolders.TempFolder + "/coremod_tmp.qmod");
                 await TryImportMod(_specialFolders.TempFolder + "/coremod_tmp.qmod", true,true);
-                await _modManager.SaveMods();
             }
+            await _modManager.SaveMods();
             return true;
         }
-        public async Task<bool> checkCoreMods(bool manualCheck=false,bool lockTheLocker=false)
+        public async Task<bool> CheckCoreMods(bool manualCheck = false, bool lockTheLocker = false, bool refreshCoreMods = false)
         {
             if(lockTheLocker)_locker.StartOperation();
-            if(_coremods.ContainsKey(_patchingManager.InstalledApp.Version))
+
+            if(refreshCoreMods) await CoreModUtils.Instance.RefreshCoreMods();
+
+            var coreMods = CoreModUtils.Instance.GetCoreMods(_patchingManager.InstalledApp?.Version ?? "");
+            
+            if(coreMods.Count > 0)
             {
-                var coremods = (JArray) (((JObject) _coremods[_patchingManager.InstalledApp.Version])["mods"]);
-                List<JToken> missingCoremodsList = coremods.ToList();
+                var missingCoremodsList = coreMods;
                 foreach(var cmod in _modManager.AllMods)
                 {
                     missingCoremodsList.ForEach(async m =>
                     {
-                        bool isThatMod = cmod.Id == (((JObject) m)["id"]).ToString();
-                        bool isRightVersion= cmod.Version.ToString() == (((JObject) m)["version"]).ToString();
+                        bool isThatMod = cmod.Id == m["id"]?.ToString();
+                        bool isRightVersion= cmod.Version.ToString() == m["version"]?.ToString();
                         if(isThatMod && isRightVersion && !cmod.IsInstalled) await cmod.Install();
                         if(isThatMod && !isRightVersion){
                             await cmod.Uninstall();
@@ -595,7 +596,7 @@ namespace QuestPatcher
         private async Task<bool> TryImportMod(string path, bool avoidCoremodCheck = false,bool ignoreWrongVersion=false)
         {
             if(!avoidCoremodCheck) 
-                if(!(await checkCoreMods()))return false;
+                if(!(await CheckCoreMods()))return false;
 
             // Import the mod file and copy it to the quest
             IMod? mod = await _modManager.TryParseMod(path);
