@@ -63,7 +63,7 @@ namespace QuestPatcher.Services
                     new ManageModsViewModel(ModManager, PatchingManager, window, _operationLocker, progressViewModel, _browseManager),
                     _loggingViewModel,
                     new ToolsViewModel(Config, progressViewModel, _operationLocker, window, SpecialFolders, PatchingManager, DebugBridge, this, InfoDumper,
-                        _themeManager, _browseManager),
+                        _themeManager, _browseManager, ModManager),
                     _otherItemsView,
                     Config,
                     PatchingManager,
@@ -111,7 +111,7 @@ namespace QuestPatcher.Services
                         Text = "安装APK",
                         OnClick = async () =>
                         {
-                            await _browseManager.askToInstall();
+                            await _browseManager.AskToInstallApk();
                         }
                     });
                     await builder1.OpenDialogue(_mainWindow);

@@ -63,7 +63,7 @@ namespace QuestPatcher
                 Extensions = copyType.SupportedExtensions
             };
         }
-        public async Task askToInstall()
+        public async Task AskToInstallApk(bool deleteMods = false)
         {
             OpenFileDialog dialog = new OpenFileDialog()
             {
@@ -84,7 +84,6 @@ namespace QuestPatcher
                         Text = "你选择的文件有误，将不会继续安装。",
                         HideCancelButton = true
                     };
-                    builder1.OkButton.ReturnValue = false;
                     await builder1.OpenDialogue(_mainWindow);
                     return;
                 }
@@ -102,6 +101,8 @@ namespace QuestPatcher
                 _locker.StartOperation();
                 
                 _mainWindow.IsEnabled = false;
+
+                if (deleteMods) await _modManager.DeleteAllMods();
                 await _patchingManager.Uninstall();
 
                 await _patchingManager.InstallApp(files[0]);
@@ -159,13 +160,11 @@ namespace QuestPatcher
             
             DialogBuilder builder1 = new()
             {
-                Title = "请选择要安装的应用",
-                Text = "点击确定以选择要安装的应用",
-                HideCancelButton = true
+                Title = "更换游戏版本",
+                Text = "换版本会删除所有的Mod，但不会影响您的歌曲、模型资源；降级完成后您可以把对应版本的Mod重新装回去，即可继续使用这些资源。\n\n点击继续并选择目标版本的游戏APK即可完成更换版本",
             };
-            builder1.OkButton.ReturnValue = false;
-            await builder1.OpenDialogue(_mainWindow);
-            await askToInstall();
+            builder1.OkButton.Text = "继续";
+            if (await builder1.OpenDialogue(_mainWindow)) await AskToInstallApk(true);
         }
         private void AddAllCosmeticFilters(OpenFileDialog dialog)
         {

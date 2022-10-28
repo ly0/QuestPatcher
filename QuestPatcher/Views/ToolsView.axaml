@@ -13,7 +13,7 @@
       <StackPanel Spacing="10">
         <TextBlock FontSize="20">便携操作</TextBlock>
         <StackPanel Orientation="Horizontal" Spacing="10">
-          <Button Command="{Binding UandI}" IsEnabled="{Binding Locker.IsFree}">一键降级</Button>
+          <Button Command="{Binding UninstallAndInstall}" IsEnabled="{Binding Locker.IsFree}">更换游戏版本</Button>
           <TextBlock VerticalAlignment="Center" FontSize="12">卸载游戏，然后安装指定的游戏APK</TextBlock>
         </StackPanel>
         <StackPanel Orientation="Horizontal" Spacing="10">
@@ -27,6 +27,10 @@
         <StackPanel Orientation="Horizontal" Spacing="10">
           <Button Command="{Binding UninstallApp}" IsEnabled="{Binding Locker.IsFree}">卸载游戏</Button>
           <TextBlock VerticalAlignment="Center" FontSize="12">卸载你安装的游戏</TextBlock>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Spacing="10">
+          <Button Command="{Binding DeleteAllMods}" IsEnabled="{Binding Locker.IsFree}">删除所有Mod</Button>
+          <TextBlock VerticalAlignment="Center" FontSize="12">可用于解决Mod出现兼容问题等原因导致的游戏闪退无法打开。把Mod删干净，重新装Mod。</TextBlock>
         </StackPanel>
         <StackPanel Orientation="Horizontal" Spacing="10">
           <Button Command="{Binding OpenLogsFolder}">打开日志文件夹</Button>
