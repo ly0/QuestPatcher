@@ -16,6 +16,7 @@ using QuestPatcher.Services;
 using Avalonia.Media;
 using QuestPatcher.Core.Utils;
 using Serilog;
+using Version = SemanticVersioning.Version;
 
 namespace QuestPatcher
 {
@@ -473,7 +474,7 @@ namespace QuestPatcher
             await builder.OpenDialogue(_mainWindow);
             return selectedType;
         }
-        private async Task<bool> InstallMods(List<JToken> mods) {
+        private async Task<bool> InstallMissingCoreMods(List<JToken> mods) {
             WebClient client = new WebClient();
             var mirrored = await client.DownloadStringTaskAsync("https://bs.wgzeyu.com/localization/mods.json");
             JObject obj = JObject.Parse(mirrored);
@@ -501,29 +502,47 @@ namespace QuestPatcher
             
             if(coreMods.Count > 0)
             {
-                var missingCoremodsList = coreMods;
-                foreach(var cmod in _modManager.AllMods)
-                {
-                    missingCoremodsList.ForEach(async m =>
-                    {
-                        bool isThatMod = cmod.Id == m["id"]?.ToString();
-                        bool isRightVersion= cmod.Version.ToString() == m["version"]?.ToString();
-                        if(isThatMod && isRightVersion && !cmod.IsInstalled) await cmod.Install();
-                        if(isThatMod && !isRightVersion){
-                            await cmod.Uninstall();
-                            await _modManager.DeleteMod(cmod);
-                            await _modManager.SaveMods();
-                        }
-                    });
+                var missingCoreMods = new List<JToken>();
 
-                    missingCoremodsList.RemoveAll(m => {
-                        bool isThatMod=cmod.Id == (((JObject) m)["id"]).ToString() &&
-                                cmod.Version.ToString() == (((JObject) m)["version"]).ToString();
-                        return isThatMod;
-                       });
-                    // 什么拉跨东西 但是只能这样写了，，，
+                foreach(var coreMod in coreMods)
+                {
+                    var existingCoreMod = _modManager.AllMods.Find((mod => mod.Id == coreMod["id"]?.ToString()));
+                    if (existingCoreMod == null)
+                    {
+                        // not installed at all, or not for the right version of the game
+                        missingCoreMods.Add(coreMod);
+                    }
+                    else if (Version.TryParse(coreMod["version"]?.ToString(), true, out var version) && version > existingCoreMod.Version)
+                    {
+                        // this coreMod JToken is newer than the installed one
+                        // don't allow core mod downgrade when checking against core mod json
+                        
+                        await existingCoreMod.Uninstall(); // delete the current one
+                        await _modManager.DeleteMod(existingCoreMod);
+                        await _modManager.SaveMods();
+                        
+                        missingCoreMods.Add(coreMod); // install the new one
+                    }
+                    else
+                    {
+                        // the existing one is the "latest", enable it if not already
+                        
+                        // we can't reliably check existingCoreMod's target game version
+                        // existingCoreMod.PackageVersion can be null which we will assume it will work
+                        
+                        // existingCoreMod.PackageVersion can be not matching the game installed while still
+                        // list as the core mod for the installed game version
+                        
+                        // game downgrade or upgrade from qp will delete all mods
+                        
+                        if (!existingCoreMod.IsInstalled)
+                        {
+                            await existingCoreMod.Install();
+                        }
+                    }
                 }
-                if(missingCoremodsList.Count != 0)
+                
+                if (missingCoreMods.Count != 0)
                 {
                     DialogBuilder builder = new()
                     {
@@ -534,11 +553,9 @@ namespace QuestPatcher
                     };
                     builder.OkButton.Text = "帮我补全";
                     builder.CancelButton.Text = "取消";
-                    if(await builder.OpenDialogue(_mainWindow))
-                        await InstallMods(missingCoremodsList);
-
+                    if (await builder.OpenDialogue(_mainWindow)) await InstallMissingCoreMods(missingCoreMods);
                 }
-                else if(manualCheck)
+                else if (manualCheck)
                 {
                     DialogBuilder builder = new()
                     {
@@ -562,22 +579,21 @@ namespace QuestPatcher
                 builder.OkButton.Text = "仍然安装";
                 builder.CancelButton.Text = "取消";
                 builder.WithButtons(
-                new ButtonInfo
-                {
-                    Text = "进入新手教程",
-                    CloseDialogue = true,
-                    ReturnValue = true,
-                    OnClick = async () =>
+                    new ButtonInfo
                     {
-                        ProcessStartInfo psi = new()
+                        Text = "进入新手教程",
+                        CloseDialogue = true,
+                        ReturnValue = true,
+                        OnClick = () => 
                         {
-                            FileName = "https://bs.wgzeyu.com/oq-guide-qp/",
-                            UseShellExecute = true
-                        };
-                        Process.Start(psi);
-                    }
-                }
-            );
+                            ProcessStartInfo psi = new()
+                            {
+                                FileName = "https://bs.wgzeyu.com/oq-guide-qp/",
+                                UseShellExecute = true
+                            };
+                            Process.Start(psi); 
+                        } 
+                    });
                 if(!await builder.OpenDialogue(_mainWindow))
                 {
                     if(lockTheLocker) _locker.FinishOperation();
