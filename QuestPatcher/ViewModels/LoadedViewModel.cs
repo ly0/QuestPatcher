@@ -11,6 +11,7 @@ using Serilog.Core;
 using System.Linq;
 using QuestPatcher.Views;
 using System.Net;
+using QuestPatcher.Core;
 using QuestPatcher.Utils;
 using Serilog;
 
@@ -79,6 +80,8 @@ namespace QuestPatcher.ViewModels
                 return _patchingManager.InstalledApp;
             }
         }
+
+        public string QPVersion => VersionUtil.QuestPatcherVersion.ToString();
 
         private readonly PatchingManager _patchingManager;
         private readonly BrowseImportManager _browseManager;
