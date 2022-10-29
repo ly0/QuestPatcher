@@ -8,6 +8,7 @@ using System;
 using System.Diagnostics;
 using System.Net;
 using System.Threading.Tasks;
+using QuestPatcher.Utils;
 
 namespace QuestPatcher
 {
@@ -29,8 +30,6 @@ namespace QuestPatcher
             _config = config;
             _uiService = uiService;
             _specialFolders = specialFolders;
-
-            
         }
         public async Task<bool> CheckUpdate()
         {
@@ -42,73 +41,47 @@ namespace QuestPatcher
                 var str = await client.DownloadStringTaskAsync("https://beatmods.wgzeyu.com/githubapi/MicroCBer/QuestPatcher/latest");
                 JObject upd = JObject.Parse(str);
        
-            var newest = upd["tag_name"].ToString();
-            if(newest != VersionUtil.QuestPatcherVersion.ToString())
+                var newest = upd["tag_name"].ToString();
+                if (newest != VersionUtil.QuestPatcherVersion.ToString())
                 {
                     DialogBuilder builder = new()
                     {
                         Title = "有更新！",
                         Text = $"**不更新软件，可能会遇到未知问题，强烈建议更新至最新版**\n" +
                         $"同时，非最新版本将不受支持且不保证没有安全问题\n\n" +
-                        $"您的版本 - v{VersionUtil.QuestPatcherVersion.ToString()}\n" +
+                        $"您的版本 - v{VersionUtil.QuestPatcherVersion}\n" +
                         $"最新版本 - v{newest}",
                         HideOkButton = true,
                         HideCancelButton = true
                     };
                     builder.WithButtons(
-                         new ButtonInfo
+                        new ButtonInfo
                          {
                              Text = "进入QP教程",
                              CloseDialogue = true,
                              ReturnValue = true,
-                             OnClick = async () =>
-                             {
-                                 ProcessStartInfo psi = new()
-                                 {
-                                     FileName = "https://bs.wgzeyu.com/oq-guide-qp/#install_qp",
-                                     UseShellExecute = true
-                                 };
-                                 Process.Start(psi);
-                             }
-                         },
-                    new ButtonInfo
-                    {
-                        Text = "进入网盘下载",
-                        CloseDialogue = true,
-                        ReturnValue = true,
-                        OnClick = async () =>
+                             OnClick = () => Util.OpenWebpage("https://bs.wgzeyu.com/oq-guide-qp/#install_qp")
+                         }, 
+                        new ButtonInfo
                         {
-                            ProcessStartInfo psi = new()
-                            {
-                                FileName = "http://share.wgzeyu.vip/?Ly8lRTUlQjclQTUlRTUlODUlQjclRUYlQkMlODglRTUlQTYlODJNb2QlRTUlQUUlODklRTglQTMlODUlRTUlOTklQTglRTMlODAlODElRTglQjAlQjElRTklOUQlQTIlRTclQkMlOTYlRTglQkUlOTElRTUlOTklQTglRTclQUQlODlCUyVFNyU5QiVCOCVFNSU4NSVCMyVFOCVCRCVBRiVFNCVCQiVCNiVFRiVCQyU4OS8=",
-                                UseShellExecute = true
-                            };
-                            Process.Start(psi);
-                        }
-                    },
-                    new ButtonInfo
-                    {
-                        Text = "进入GitHub下载",
-                        CloseDialogue = true,
-                        ReturnValue = true,
-                        OnClick = async () =>
+                            Text = "进入网盘下载",
+                            CloseDialogue = true,
+                            ReturnValue = true,
+                            OnClick = () => Util.OpenWebpage("http://share.wgzeyu.vip/?Ly8lRTUlQjclQTUlRTUlODUlQjclRUYlQkMlODglRTUlQTYlODJNb2QlRTUlQUUlODklRTglQTMlODUlRTUlOTklQTglRTMlODAlODElRTglQjAlQjElRTklOUQlQTIlRTclQkMlOTYlRTglQkUlOTElRTUlOTklQTglRTclQUQlODlCUyVFNyU5QiVCOCVFNSU4NSVCMyVFOCVCRCVBRiVFNCVCQiVCNiVFRiVCQyU4OS8=")
+                        },
+                        new ButtonInfo
                         {
-                            ProcessStartInfo psi = new()
-                            {
-                                FileName = "https://github.com/MicroCBer/QuestPatcher/releases/latest",
-                                UseShellExecute = true
-                            };  
-                            Process.Start(psi);
-                        }
-                    }
-                    );
+                            Text = "进入GitHub下载",
+                            CloseDialogue = true,
+                            ReturnValue = true,
+                            OnClick = () => Util.OpenWebpage("https://github.com/MicroCBer/QuestPatcher/releases/latest")
+                        });
 
                     await builder.OpenDialogue(_mainWindow);
                 }
-               
                 return true;
             }
-            catch(WebException ex)
+            catch (WebException ex)
             {
                 DialogBuilder builder = new()
                 {
@@ -116,59 +89,34 @@ namespace QuestPatcher
                     Text = $"请手动检查更新",
                     HideOkButton = true
                 };
-                builder.CancelButton.Text = "关闭";
                 builder.WithButtons(
                     new ButtonInfo
                     {
                         Text = "进入QP教程",
                         CloseDialogue = true,
                         ReturnValue = true,
-                        OnClick = async () =>
-                        {
-                            ProcessStartInfo psi = new()
-                            {
-                                FileName = "https://bs.wgzeyu.com/oq-guide-qp/#install_qp",
-                                UseShellExecute = true
-                            };
-                            Process.Start(psi);
-                        }
-                    },
+                        OnClick = () => Util.OpenWebpage("https://bs.wgzeyu.com/oq-guide-qp/#install_qp")
+                    }, 
                     new ButtonInfo
                     {
                         Text = "进入网盘下载",
                         CloseDialogue = true,
                         ReturnValue = true,
-                        OnClick = async () =>
-                        {
-                            ProcessStartInfo psi = new()
-                            {
-                                FileName = "http://share.wgzeyu.vip/?Ly8lRTUlQjclQTUlRTUlODUlQjclRUYlQkMlODglRTUlQTYlODJNb2QlRTUlQUUlODklRTglQTMlODUlRTUlOTklQTglRTMlODAlODElRTglQjAlQjElRTklOUQlQTIlRTclQkMlOTYlRTglQkUlOTElRTUlOTklQTglRTclQUQlODlCUyVFNyU5QiVCOCVFNSU4NSVCMyVFOCVCRCVBRiVFNCVCQiVCNiVFRiVCQyU4OS8=",
-                                UseShellExecute = true
-                            };
-                            Process.Start(psi);
-                        }
+                        OnClick = () => Util.OpenWebpage("http://share.wgzeyu.vip/?Ly8lRTUlQjclQTUlRTUlODUlQjclRUYlQkMlODglRTUlQTYlODJNb2QlRTUlQUUlODklRTglQTMlODUlRTUlOTklQTglRTMlODAlODElRTglQjAlQjElRTklOUQlQTIlRTclQkMlOTYlRTglQkUlOTElRTUlOTklQTglRTclQUQlODlCUyVFNyU5QiVCOCVFNSU4NSVCMyVFOCVCRCVBRiVFNCVCQiVCNiVFRiVCQyU4OS8=")
                     },
                     new ButtonInfo
                     {
                         Text = "进入GitHub下载",
                         CloseDialogue = true,
                         ReturnValue = true,
-                        OnClick = async () =>
-                        {
-                            ProcessStartInfo psi = new()
-                            {
-                                FileName = "https://github.com/MicroCBer/QuestPatcher/releases/latest",
-                                UseShellExecute = true
-                            };
-                            Process.Start(psi);
-                        }
-                    }
-                );
+                        OnClick = () => Util.OpenWebpage("https://github.com/MicroCBer/QuestPatcher/releases/latest")
+                    });
 
                 await builder.OpenDialogue(_mainWindow);
-                return false;
-           }
+                return false; 
+            }
         }
+        
         public Task<bool> PromptAppNotInstalled()
         {
             Debug.Assert(_config != null);
@@ -179,7 +127,6 @@ namespace QuestPatcher
                 Text = $"所选择的APP - {_config.AppId} - 没有在你的Quest2上安装",
                 HideOkButton = true
             };
-            builder.CancelButton.Text = "关闭";
             builder.WithButtons(
                 new ButtonInfo
                 {
@@ -200,9 +147,7 @@ namespace QuestPatcher
         public Task<bool> PromptAdbDisconnect(DisconnectionType type)
         {
             DialogBuilder builder = new();
-
             builder.OkButton.Text = "重试";
-
             switch (type)
             {
                 case DisconnectionType.NoDevice:
@@ -212,15 +157,7 @@ namespace QuestPatcher
                         new ButtonInfo
                         {
                             Text = "BeatSaber新手教程",
-                            OnClick = () =>
-                            {
-                                ProcessStartInfo psi = new()
-                                {
-                                    FileName = "https://bs.wgzeyu.com/oq-guide-qp/",
-                                    UseShellExecute = true
-                                };
-                                Process.Start(psi);
-                            }
+                            OnClick = () => Util.OpenWebpage("https://bs.wgzeyu.com/oq-guide-qp/")
                         }
                     );
                     break;
@@ -235,14 +172,18 @@ namespace QuestPatcher
                         new ButtonInfo
                         {
                             Text = "快速修复·断开所有设备的连接",
+                            CloseDialogue = false,
                             OnClick = async () =>
                             {
-                               await _uiService.MicroQuickFix("adb_kill_server");
-                               DialogBuilder builder2 = new();
-                                builder2.Title = "已经断开所有设备的连接";
-                                builder2.HideCancelButton = true;
-                                builder2.Text = "已断开所有安卓设备，请先重新连接你的Quest，然后重启QuestPatcher";
-                                
+                                await _uiService!.MicroQuickFix("adb_kill_server");
+                                var builder2 = new DialogBuilder
+                                {
+                                    Title = "已经断开所有安卓设备的连接",
+                                    Text = "请先重新连接你的Quest，然后重启QuestPatcher",
+                                    HideCancelButton = true,
+                                    HideOkButton = true
+                                };
+                                await builder2.OpenDialogue(_mainWindow);
                             }
                         }
                     );

@@ -11,59 +11,42 @@ using Serilog.Core;
 using System.Linq;
 using QuestPatcher.Views;
 using System.Net;
+using QuestPatcher.Core;
+using QuestPatcher.Utils;
 using Serilog;
 
+#pragma warning disable CA1822
 namespace QuestPatcher.ViewModels
 {
     public class LoadedViewModel : ViewModelBase
     {
-        public async void ShowTutorial()
+        public void ShowTutorial()
         {
-            ProcessStartInfo psi = new()
-            {
-                FileName = "https://bs.wgzeyu.com/oq-guide-qp/",
-                UseShellExecute = true
-            };
-            Process.Start(psi);
+            Util.OpenWebpage("https://bs.wgzeyu.com/oq-guide-qp/");
         }
-        public async void OpenSourceAddr()
+        public void OpenSourceAddr()
         {
-            ProcessStartInfo psi = new()
-            {
-                FileName = "https://github.com/MicroCBer/QuestPatcher",
-                UseShellExecute = true
-            };
-            Process.Start(psi);
+            Util.OpenWebpage("https://github.com/MicroCBer/QuestPatcher");
         }
-        public async void OpenSourceFKAddr()
+        public void OpenSourceFKAddr()
         {
-            ProcessStartInfo psi = new()
-            {
-                FileName = "https://github.com/Lauriethefish/QuestPatcher",
-                UseShellExecute = true
-            };
-            Process.Start(psi);
+            Util.OpenWebpage("https://github.com/Lauriethefish/QuestPatcher");
         }
-        public async void WGZEYUAddr()
+        public void WGZEYUAddr()
         {
-            ProcessStartInfo psi = new()
-            {
-                FileName = "https://space.bilibili.com/557131",
-                UseShellExecute = true
-            };
-            Process.Start(psi);
+            Util.OpenWebpage("https://space.bilibili.com/557131");
         }
         
-
-        public async void MBAddr()
+        public void MBAddr()
         {
-            ProcessStartInfo psi = new()
-            {
-                FileName = "https://space.bilibili.com/413164365",
-                UseShellExecute = true
-            };
-            Process.Start(psi);
+            Util.OpenWebpage("https://space.bilibili.com/413164365");
         }
+
+        public void SkyQeAddr()
+        {
+            Util.OpenWebpage("https://space.bilibili.com/3744764");
+        }
+        
         public string SelectedAppText => $"Modified by MicroBlock";
         
         public PatchingViewModel PatchingView { get; }
@@ -97,6 +80,8 @@ namespace QuestPatcher.ViewModels
                 return _patchingManager.InstalledApp;
             }
         }
+
+        public string QPVersion => VersionUtil.QuestPatcherVersion.ToString();
 
         private readonly PatchingManager _patchingManager;
         private readonly BrowseImportManager _browseManager;

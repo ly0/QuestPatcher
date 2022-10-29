@@ -6,6 +6,7 @@ using System.Net;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
+using QuestPatcher.Core.Utils;
 using QuestPatcher.QMod;
 using Serilog;
 
@@ -269,15 +270,8 @@ namespace QuestPatcher.Core.Modding
                 Log.Information($"Downloading dependency {dependency.Id} . . .");
                 try
                 {
-                    WebClient client = new WebClient();
-                    var mirrored=await client.DownloadStringTaskAsync("https://bs.wgzeyu.com/localization/mods.json");
-                    JObject obj = JObject.Parse(mirrored);
-                    if(obj.ContainsKey(dependency.DownloadUrlString))
-                    {
-                        dependency.DownloadUrlString = obj[dependency.DownloadUrlString]["mirrorUrl"].ToString();
-                        Log.Information($"[ MMirror ] Using WGzeyu's Mirror [{dependency.DownloadUrlString}]");
-                    }
-                    await _filesDownloader.DownloadUrl(dependency.DownloadUrlString, downloadFile.Path, dependency.Id);
+                    var url = _provider.UseMirrorDownload ? await DownloadMirrorUtil.Instance.GetMirrorUrl(dependency.DownloadUrlString) : dependency.DownloadUrlString;
+                    await _filesDownloader.DownloadUrl(url, downloadFile.Path, dependency.Id);
                 }
                 catch (WebException ex)
                 {

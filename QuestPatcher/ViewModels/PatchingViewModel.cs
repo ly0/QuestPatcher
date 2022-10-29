@@ -69,7 +69,8 @@ namespace QuestPatcher.ViewModels
                 builder.WithException(ex);
 
                 await builder.OpenDialogue(_mainWindow);
-            }   finally
+            }
+            finally
             {
                 IsPatchingInProgress = false;
                 Locker.FinishOperation();

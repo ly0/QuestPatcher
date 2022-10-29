@@ -5,8 +5,10 @@ using QuestPatcher.Views;
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Threading.Tasks;
 using ReactiveUI;
 using QuestPatcher.Core;
+using QuestPatcher.Core.Modding;
 using QuestPatcher.Core.Models;
 using QuestPatcher.Core.Patching;
 using Serilog;
@@ -35,16 +37,19 @@ namespace QuestPatcher.ViewModels
         private readonly QuestPatcherUiService _uiService;
         private readonly InfoDumper _dumper;
         private readonly BrowseImportManager _browseManager;
+        private readonly ModManager _modManager;
 
         public ToolsViewModel(Config config, ProgressViewModel progressView, OperationLocker locker, 
             Window mainWindow, SpecialFolders specialFolders, PatchingManager patchingManager, 
-            AndroidDebugBridge debugBridge, QuestPatcherUiService uiService, InfoDumper dumper, ThemeManager themeManager,BrowseImportManager browseManager)
+            AndroidDebugBridge debugBridge, QuestPatcherUiService uiService, InfoDumper dumper, ThemeManager themeManager, 
+            BrowseImportManager browseManager, ModManager modManager)
         {
             Config = config;
             ProgressView = progressView;
             Locker = locker;
             ThemeManager = themeManager;
             _browseManager = browseManager;
+            _modManager = modManager;
 
             _mainWindow = mainWindow;
             _specialFolders = specialFolders;
@@ -60,16 +65,16 @@ namespace QuestPatcher.ViewModels
                 this.RaisePropertyChanged(nameof(AdbButtonText));
             };
         }
-        public async void UandI()
+        public async void UninstallAndInstall()
         {
             await _browseManager.UninstallAndInstall();
         }
 
         public async void InstallServerSwitcher()
         {
-
-            await _browseManager.InstallApk("https://ganbei-hot-update-1258625969.file.myqcloud.com/questpatcher_mirror/Icey-latest.apk");
+            await _browseManager.InstallApkFromUrl("https://ganbei-hot-update-1258625969.file.myqcloud.com/questpatcher_mirror/Icey-latest.apk");
         }
+
         public async void UninstallApp()
         {
             try
@@ -98,6 +103,34 @@ namespace QuestPatcher.ViewModels
             catch (Exception ex)
             {
                 Log.Error($"卸载 {ex} 失败！");
+            }
+        }
+
+        public async void DeleteAllMods()
+        {
+            DialogBuilder builder = new()
+            {
+                Title = "你确定要删除所有Mod吗？此操作不可恢复!",
+                Text = "删除后，你可以通过Mod管理页面的“检查核心Mod”按钮来重新安装核心Mod，\n 歌曲、模型等资源不会受到任何影响，在装好版本匹配的Mod之后即可继续使用。"
+            };
+            builder.OkButton.Text = "好的，删掉";
+            builder.CancelButton.Text = "算了，我再想想";
+            if (!await builder.OpenDialogue(_mainWindow)) return;
+            
+            Locker.StartOperation();
+            try
+            {
+                Log.Information("开始删除所有MOD！");
+                await _modManager.DeleteAllMods();
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "删除所有Mod竟然失败了！");
+                await _modManager.SaveMods();
+            }
+            finally
+            {
+                Locker.FinishOperation();
             }
         }
 

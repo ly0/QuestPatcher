@@ -475,8 +475,7 @@ namespace QuestPatcher.Core.Patching
 
         public async Task InstallApp(string path)
         {
-            
-            await _debugBridge.InstallApp(path);
+            await _debugBridge.InstallApp(path, _config.UseNewApkInstallMethod);
         }
 
         private async Task AddFlatscreenSupport(ZipArchive apkArchive)
@@ -574,14 +573,10 @@ namespace QuestPatcher.Core.Patching
                 throw new NullReferenceException("Cannot patch before installed app has been checked");
             }
             
-            if (_config.PatchingPermissions.FlatScreenSupport)
+            if (_config.PatchingPermissions.FlatScreenSupport && !await _prompter.PromptFlatScreenWarning())
             {
-                if (
-                    !await _prompter
-                        .PromptFlatScreenWarning()) // Disable VR requirement apparently causes infinite load
-                {
-                    return;
-                }
+                // Disable VR requirement apparently causes infinite load
+                return;
             }
 
             _patchingStage = PatchingStage.MovingToTemp;
@@ -756,7 +751,7 @@ namespace QuestPatcher.Core.Patching
             Log.Information("Installing the modded APK . . .");
             PatchingStage = PatchingStage.InstallingModded;
 
-            await _debugBridge.InstallApp(patchedApkPath);
+            await _debugBridge.InstallApp(patchedApkPath, _config.UseNewApkInstallMethod);
 
             if(backupPath != null)
             {

@@ -82,6 +82,12 @@ namespace QuestPatcher.Core.Models
         }
         private bool _pauseBeforeCompile;
         
+        [DefaultValue(false)]
+        public bool UseNewApkInstallMethod { get; set; }
+
+        [DefaultValue(true)]
+        public bool UseMirrorDownload { get; set; } = true;
+        
         public string SelectedThemeName { get; set; } = "Dark";
 
         public event PropertyChangedEventHandler? PropertyChanged;

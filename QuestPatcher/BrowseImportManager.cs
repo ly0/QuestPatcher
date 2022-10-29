@@ -14,7 +14,10 @@ using System.Net;
 using QuestPatcher.Core;
 using QuestPatcher.Services;
 using Avalonia.Media;
+using QuestPatcher.Core.Utils;
+using QuestPatcher.Utils;
 using Serilog;
+using Version = SemanticVersioning.Version;
 
 namespace QuestPatcher
 {
@@ -35,11 +38,9 @@ namespace QuestPatcher
         private readonly Window _mainWindow;
         private readonly PatchingManager _patchingManager;
         private readonly OperationLocker _locker;
-        private readonly JObject _coremods;
         private readonly SpecialFolders _specialFolders;
         private readonly FileDialogFilter _modsFilter = new();
         private readonly QuestPatcherUiService _uiService;
-        private readonly LoadedView _loaded;
         private Queue<FileImportInfo>? _currentImportQueue;
 
         public BrowseImportManager(OtherFilesManager otherFilesManager, ModManager modManager, Window mainWindow, PatchingManager patchingManager, OperationLocker locker,SpecialFolders specialFolders, QuestPatcherUiService uiService)
@@ -51,8 +52,6 @@ namespace QuestPatcher
             _mainWindow = mainWindow;
             _patchingManager = patchingManager;
             _locker = locker;
-            WebClient client = new();
-            _coremods = JObject.Parse(client.DownloadString("https://beatmods.wgzeyu.com/github/BMBFresources/com.beatgames.beatsaber/core-mods.json"));
             _modsFilter.Name = "Quest Mods";
             _modsFilter.Extensions.Add("qmod");
         }
@@ -65,9 +64,9 @@ namespace QuestPatcher
                 Extensions = copyType.SupportedExtensions
             };
         }
-        public async Task askToInstall()
+        public async Task AskToInstallApk(bool deleteMods = false)
         {
-            OpenFileDialog dialog = new OpenFileDialog()
+            var dialog = new OpenFileDialog
             {
                 AllowMultiple = false
             };
@@ -75,56 +74,55 @@ namespace QuestPatcher
             filter.Extensions.Add("apk");
             filter.Name = "Beat Saber APKs";
             dialog.Filters.Add(filter);
-            string[] files = await dialog.ShowAsync(_mainWindow);
-            if(files != null)
+            var files = await dialog.ShowAsync(_mainWindow);
+            if (files == null || files.Length == 0) return;
+            var file = files[0] ?? "";
+            if (!file.EndsWith(".apk"))
             {
-                if(!files[0].EndsWith(".apk"))
+                DialogBuilder builder1 = new()
                 {
-                    DialogBuilder builder1 = new()
-                    {
-                        Title = "你选择的文件有误",
-                        Text = "你选择的文件有误，将不会继续安装。",
-                        HideCancelButton = true
-                    };
-                    builder1.OkButton.ReturnValue = false;
-                    await builder1.OpenDialogue(_mainWindow);
-                    return;
-                }
-
-                {
-                    DialogBuilder builder1 = new()
-                    {
-                        Title = "即将开始安装",
-                        Text = "安装可能需要两分钟左右，该过程中将暂时无法点击软件窗口，请耐心等待，\n点击下方“好的”按钮，即可开始安装。",
-                        HideCancelButton = true
-                    };
-                    builder1.OkButton.ReturnValue = false;
-                    await builder1.OpenDialogue(_mainWindow);
-                }
-                _locker.StartOperation();
-                
-                _mainWindow.IsEnabled = false;
-                await _patchingManager.Uninstall();
-
-                await _patchingManager.InstallApp(files[0]);
-                _locker.FinishOperation();
-                {
-                    DialogBuilder builder1 = new()
-                    {
-                        Title = "安装已完成！",
-                        Text = "点击确定以重启QuestPatcher",
-                        HideCancelButton = true
-                    };
-                    builder1.OkButton.ReturnValue = false;
-                    await builder1.OpenDialogue(_mainWindow);
-                }
-                _mainWindow.IsEnabled = true;
-                await _uiService.Reload();
+                    Title = "你选择的文件有误",
+                    Text = "你选择的文件有误，将不会继续安装。",
+                    HideCancelButton = true
+                };
+                await builder1.OpenDialogue(_mainWindow);
+                return;
             }
-            
+
+            {
+                DialogBuilder builder1 = new()
+                {
+                    Title = "即将开始安装",
+                    Text = "安装可能需要两分钟左右，该过程中将暂时无法点击软件窗口，请耐心等待，\n点击下方“好的”按钮，即可开始安装。",
+                };
+                if (!await builder1.OpenDialogue(_mainWindow)) return;
+            }
+            _locker.StartOperation();
+
+            try
+            {
+                if (deleteMods) await _modManager.DeleteAllMods();
+                await _patchingManager.Uninstall();
+                await _patchingManager.InstallApp(file);
+            }
+            finally
+            {
+                _locker.FinishOperation();
+            }
+            {
+                DialogBuilder builder1 = new()
+                {
+                    Title = "安装已完成！",
+                    Text = "点击确定以重启QuestPatcher",
+                    HideCancelButton = true
+                };
+                await builder1.OpenDialogue(_mainWindow);
+            }
+            await _uiService.Reload();
             
         }
-        public async Task InstallApk(string url)
+        
+        public async Task InstallApkFromUrl(string url)
         {
             {
                 DialogBuilder builder1 = new()
@@ -137,13 +135,10 @@ namespace QuestPatcher
                 await builder1.OpenDialogue(_mainWindow);
             }
             _locker.StartOperation();
-            _mainWindow.IsEnabled = false;
             WebClient client = new();
             File.Delete(_specialFolders.TempFolder + "/apkToInstall.apk");
             await client.DownloadFileTaskAsync(url+"?_="+ DateTime.Now.ToFileTime(), _specialFolders.TempFolder+"/apkToInstall.apk");
             await _patchingManager.InstallApp( _specialFolders.TempFolder + "/apkToInstall.apk");
-            _locker.FinishOperation();
-            _mainWindow.IsEnabled = true;
             _locker.FinishOperation();
             {
                 DialogBuilder builder1 = new()
@@ -156,18 +151,38 @@ namespace QuestPatcher
                 await builder1.OpenDialogue(_mainWindow);
             }
         }
+        
         public async Task UninstallAndInstall()
         {
-            
             DialogBuilder builder1 = new()
             {
-                Title = "请选择要安装的应用",
-                Text = "点击确定以选择要安装的应用",
-                HideCancelButton = true
+                Title = "更换游戏版本",
+                Text = "换版本会删除所有的Mod，但不会影响您的歌曲、模型资源。降级完成后您可以把对应版本的Mod重新装回去，即可继续使用这些资源。\n\n点击继续并选择目标版本的游戏APK即可完成更换版本\n如果您还没有游戏APK，可以进入网盘下载",
             };
-            builder1.OkButton.ReturnValue = false;
-            await builder1.OpenDialogue(_mainWindow);
-            await askToInstall();
+            builder1.OkButton.Text = "继续";
+            builder1.WithButtons(new ButtonInfo
+            {
+                Text = "进入网盘",
+                CloseDialogue = false,
+                OnClick = () => Util.OpenWebpage("https://bs.wgzeyu.com/drive/")
+            });
+            
+            if (!await builder1.OpenDialogue(_mainWindow)) return;
+            
+            try
+            {
+                await AskToInstallApk(true);
+            }
+            catch (Exception e)
+            {
+                var builder2 = new DialogBuilder {
+                    Title = "出错了！",
+                    Text = "在更换版本的过程中出现了一个意料之外的错误。",
+                    HideCancelButton = true
+                };
+                builder2.WithException(e);
+                await builder2.OpenDialogue(_mainWindow);
+            }
         }
         private void AddAllCosmeticFilters(OpenFileDialog dialog)
         {
@@ -343,15 +358,15 @@ namespace QuestPatcher
 
             DialogBuilder builder = new()
             {
-                Title = "导入失败"
+                Title = "导入失败",
+                HideCancelButton = true
             };
-            builder.HideCancelButton = true;
 
-            if(multiple)
+            if (multiple)
             {
                 // Show the exceptions for multiple files in the logs to avoid a giagantic dialog
                 builder.Text = "有多个文件安装失败，请检查日志确认详情。";
-                foreach(KeyValuePair<string, Exception> pair in failedFiles)
+                foreach (KeyValuePair<string, Exception> pair in failedFiles)
                 {
                     Log.Error($"{Path.GetFileName(pair.Key)}安装失败：{pair.Value.Message}");
                     Log.Debug($"Full error: {pair.Value}");
@@ -364,7 +379,7 @@ namespace QuestPatcher
                 Exception exception = failedFiles.Values.First();
 
                 // Don't display the full stack trace for InstallationExceptions, since these are thrown by QP and are not bugs/issues
-                if(exception is InstallationException)
+                if (exception is InstallationException)
                 {
                     builder.Text = $"{Path.GetFileName(filePath)}安装失败：{exception.Message}";
                 }
@@ -436,7 +451,14 @@ namespace QuestPatcher
                 return;
             }
 
-            throw new InstallationException($"Unrecognised file type {extension}");
+            // if there are no core mods and the user cancels the import,
+            // TryImportMod will return false even though the file is a qmod
+            if (extension != ".qmod")
+            {
+                throw new InstallationException($"未知文件类型 {extension}");
+            }
+
+            throw new InstallationException("qmod文件可能损坏或者核心mod缺失");
         }
 
         /// <summary>
@@ -453,8 +475,7 @@ namespace QuestPatcher
             {
                 Title = "多种导入选项",
                 Text = $"{Path.GetFileName(path)}可以作为多种不同类型的文件导入，请选择你想要安装的内容。",
-                HideOkButton = true,
-                HideCancelButton = true
+                HideOkButton = true
             };
 
             List<ButtonInfo> dialogButtons = new();
@@ -476,53 +497,79 @@ namespace QuestPatcher
             await builder.OpenDialogue(_mainWindow);
             return selectedType;
         }
-        private async Task<bool> InstallMods(List<JToken> mods) {
+        private async Task<bool> InstallMissingCoreMods(List<JToken> mods) {
             WebClient client = new WebClient();
-            var mirrored = await client.DownloadStringTaskAsync("https://bs.wgzeyu.com/localization/mods.json");
-            JObject obj = JObject.Parse(mirrored);
             foreach(var mod in mods)
             {
-                var modUrl = mod["downloadLink"].ToString();
-                if(obj.ContainsKey(modUrl))
+                var modUrl = mod["downloadLink"]?.ToString();
+
+                if (modUrl != null)
                 {
-                    modUrl = obj[modUrl]["mirrorUrl"].ToString();
-                    Log.Information($"[ MMirror ] Using WGzeyu's Mirror [{modUrl}]");
+                    if (_uiService.Config.UseMirrorDownload) modUrl = await DownloadMirrorUtil.Instance.GetMirrorUrl(modUrl);
+                    await client.DownloadFileTaskAsync(modUrl, _specialFolders.TempFolder + "/coremod_tmp.qmod");
+                    await TryImportMod(_specialFolders.TempFolder + "/coremod_tmp.qmod", true,true);
                 }
-                await client.DownloadFileTaskAsync(modUrl, _specialFolders.TempFolder + "/coremod_tmp.qmod");
-                await TryImportMod(_specialFolders.TempFolder + "/coremod_tmp.qmod", true,true);
-                await _modManager.SaveMods();
+                else
+                {
+                    Log.Fatal("Core Mod {} has null download link!", mod["id"]?.ToString()?? "null");
+                }
             }
+            client.Dispose();
+            await _modManager.SaveMods();
             return true;
         }
-        public async Task<bool> checkCoreMods(bool manualCheck=false,bool lockTheLocker=false)
+        
+        /**
+         * Return true if all core mods are installed or the user want's to ignore missing core mods
+         */
+        public async Task<bool> CheckCoreMods(bool manualCheck = false, bool lockTheLocker = false, bool refreshCoreMods = false)
         {
-            if(lockTheLocker)_locker.StartOperation();
-            if(_coremods.ContainsKey(_patchingManager.InstalledApp.Version))
+            if (lockTheLocker) _locker.StartOperation();
+            if (refreshCoreMods) await CoreModUtils.Instance.RefreshCoreMods();
+            
+            var coreMods = CoreModUtils.Instance.GetCoreMods(_patchingManager.InstalledApp?.Version ?? "");
+            if (coreMods.Count > 0)
             {
-                var coremods = (JArray) (((JObject) _coremods[_patchingManager.InstalledApp.Version])["mods"]);
-                List<JToken> missingCoremodsList = coremods.ToList();
-                foreach(var cmod in _modManager.AllMods)
+                var missingCoreMods = new List<JToken>();
+                foreach(var coreMod in coreMods)
                 {
-                    missingCoremodsList.ForEach(async m =>
+                    var existingCoreMod = _modManager.AllMods.Find((mod => mod.Id == coreMod["id"]?.ToString()));
+                    if (existingCoreMod == null)
                     {
-                        bool isThatMod = cmod.Id == (((JObject) m)["id"]).ToString();
-                        bool isRightVersion= cmod.Version.ToString() == (((JObject) m)["version"]).ToString();
-                        if(isThatMod && isRightVersion && !cmod.IsInstalled) await cmod.Install();
-                        if(isThatMod && !isRightVersion){
-                            await cmod.Uninstall();
-                            await _modManager.DeleteMod(cmod);
-                            await _modManager.SaveMods();
+                        // not installed at all, or not for the right version of the game
+                        missingCoreMods.Add(coreMod);
+                    }
+                    else if (Version.TryParse(coreMod["version"]?.ToString(), true, out var version) && version > existingCoreMod.Version)
+                    {
+                        // this coreMod JToken is newer than the installed one
+                        // don't allow core mod downgrade when checking against core mod json
+                        
+                        await existingCoreMod.Uninstall(); // delete the current one
+                        await _modManager.DeleteMod(existingCoreMod);
+                        await _modManager.SaveMods();
+                        
+                        missingCoreMods.Add(coreMod); // install the new one
+                    }
+                    else
+                    {
+                        // the existing one is the "latest", enable it if not already
+                        
+                        // we can't reliably check existingCoreMod's target game version
+                        // existingCoreMod.PackageVersion can be null which we will assume it will work
+                        
+                        // existingCoreMod.PackageVersion can be not matching the game installed while still
+                        // list as the core mod for the installed game version
+                        
+                        // game downgrade or upgrade from qp will delete all mods
+                        
+                        if (!existingCoreMod.IsInstalled)
+                        {
+                            await existingCoreMod.Install();
                         }
-                    });
-
-                    missingCoremodsList.RemoveAll(m => {
-                        bool isThatMod=cmod.Id == (((JObject) m)["id"]).ToString() &&
-                                cmod.Version.ToString() == (((JObject) m)["version"]).ToString();
-                        return isThatMod;
-                       });
-                    // 什么拉跨东西 但是只能这样写了，，，
+                    }
                 }
-                if(missingCoremodsList.Count != 0)
+                
+                if (missingCoreMods.Count != 0)
                 {
                     DialogBuilder builder = new()
                     {
@@ -532,59 +579,61 @@ namespace QuestPatcher
                         "是否补全核心Mod？"
                     };
                     builder.OkButton.Text = "帮我补全";
-                    builder.CancelButton.Text = "取消";
-                    if(await builder.OpenDialogue(_mainWindow))
-                        await InstallMods(missingCoremodsList);
-
-                }
-                else if(manualCheck)
+                    if (await builder.OpenDialogue(_mainWindow))
+                    {
+                        await InstallMissingCoreMods(missingCoreMods);
+                        goto CoreModsOK;
+                    }
+                    goto CoreModsNotOK;
+                } 
+                if (manualCheck)
                 {
                     DialogBuilder builder = new()
                     {
                         Title = "核心Mod安装正确！",
-                        Text = "恭喜你，你已经装好了核心Mod！"
+                        Text = "恭喜你，你已经装好了核心Mod！",
+                        HideCancelButton = true
                     };
-                    builder.OkButton.Text = "好的";
-                    builder.HideCancelButton = true;
                     await builder.OpenDialogue(_mainWindow);
                 }
+                goto CoreModsOK;
             }
             else
             {
                 DialogBuilder builder = new()
                 {
                     Title = "未找到该版本的核心Mod！",
-                    Text = $"你当前安装的游戏版本为{_patchingManager.InstalledApp.Version}，但核心Mod还没有更新、还没有适配该版本，所以无法安装核心Mod。\n" +
-                    $"你可以先降级游戏再重新打补丁装Mod。\n如需降级请查看新手教程左下角"
+                    Text = $"你当前安装的游戏版本为{_patchingManager.InstalledApp.Version}，但核心Mod还没有更新，还没有适配该版本，所以无法安装核心Mod。\n" +
+                    $"你可以先降级游戏再重新打补丁装Mod。\n如需降级请查看新手教程左下角",
+                    HideCancelButton = manualCheck
                 };
-                if(manualCheck)builder.HideOkButton=true;
-                builder.OkButton.Text = "仍然安装";
-                builder.CancelButton.Text = "取消";
+                builder.OkButton.Text = manualCheck ? "我知道了！" : "仍然安装";
                 builder.WithButtons(
-                new ButtonInfo
-                {
-                    Text = "进入新手教程",
-                    CloseDialogue = true,
-                    ReturnValue = true,
-                    OnClick = async () =>
+                    new ButtonInfo
                     {
-                        ProcessStartInfo psi = new()
-                        {
-                            FileName = "https://bs.wgzeyu.com/oq-guide-qp/",
-                            UseShellExecute = true
-                        };
-                        Process.Start(psi);
-                    }
-                }
-            );
-                if(!await builder.OpenDialogue(_mainWindow))
+                        Text = "进入新手教程",
+                        ReturnValue = true,
+                        OnClick = () => Util.OpenWebpage("https://bs.wgzeyu.com/oq-guide-qp/")
+                    });
+                
+                if (await builder.OpenDialogue(_mainWindow))
                 {
-                    if(lockTheLocker) _locker.FinishOperation();
-                    return false;
+                    goto CoreModsOK;
+                }
+                else
+                {
+                    goto CoreModsNotOK;
                 }
             }
-            if(lockTheLocker) _locker.FinishOperation();
+            
+            CoreModsOK:
+            if (lockTheLocker) _locker.FinishOperation();
             return true;
+            
+            CoreModsNotOK:
+            if (lockTheLocker) _locker.FinishOperation();
+            return false;
+            
         }
         /// <summary>
         /// Imports then installs a mod.
@@ -594,8 +643,9 @@ namespace QuestPatcher
         /// <returns>Whether or not the file could be imported as a mod</returns>
         private async Task<bool> TryImportMod(string path, bool avoidCoremodCheck = false,bool ignoreWrongVersion=false)
         {
-            if(!avoidCoremodCheck) 
-                if(!(await checkCoreMods()))return false;
+            if (!avoidCoremodCheck)
+                if (!await CheckCoreMods())
+                    return false;
 
             // Import the mod file and copy it to the quest
             IMod? mod = await _modManager.TryParseMod(path);

@@ -1,6 +1,7 @@
 ﻿using QuestPatcher.Core.Modding;
 using QuestPatcher.Core.Models;
 using QuestPatcher.Core.Patching;
+using QuestPatcher.Core.Utils;
 using Serilog;
 using Serilog.Core;
 using System;
@@ -27,7 +28,7 @@ namespace QuestPatcher.Core
         
         protected InfoDumper InfoDumper { get; }
 
-        protected Config Config => _configManager.GetOrLoadConfig();
+        public Config Config => _configManager.GetOrLoadConfig();
         
         private readonly ConfigManager _configManager;
 
@@ -124,7 +125,9 @@ namespace QuestPatcher.Core
             Log.Information("App is installed");
 
             MigrateOldFiles();
-
+            CoreModUtils.Instance.PackageId = Config.AppId;
+            await CoreModUtils.Instance.RefreshCoreMods();
+            await Task.WhenAll(CoreModUtils.Instance.RefreshCoreMods(), DownloadMirrorUtil.Instance.Refresh());
             await PatchingManager.LoadInstalledApp();
             await ModManager.LoadModsForCurrentApp();
             HasLoaded = true;
@@ -185,13 +188,11 @@ namespace QuestPatcher.Core
             }
         }
 
-
         public async Task MicroQuickFix(string type)
         {
-            if(type=="adb_kill_server"){
-                        await DebugBridge.KillServer();
+            if (type=="adb_kill_server") {
+                await DebugBridge.KillServer();
             }
-            
         }
 
         /// <summary>

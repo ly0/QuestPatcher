@@ -248,23 +248,6 @@ namespace QuestPatcher.ViewModels.Modding
             if (ex is not InstallationException)
             {
                 builder.WithException(ex);
-                
-            }
-            if(ex is AdbException) {
-                if(ex.ToString().Contains("com.beatgames.beatsaber/files/mods/"))
-                {
-                    builder.Text += "\n有可能可用的快速修复 点击下方按钮尝试";
-                    builder.WithButtons(new ButtonInfo
-                    {
-                        Text = "快速修复",
-                        OnClick = async () =>
-                        {
-                        
-                            
-                          
-                        }
-                    });
-                }
             }
             await builder.OpenDialogue(_mainWindow);
         }

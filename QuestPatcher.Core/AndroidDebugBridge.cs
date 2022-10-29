@@ -205,11 +205,13 @@ namespace QuestPatcher.Core
                 if ((commands.Count - i >= 2 && currentCommand.Length + commands[i + 1].Length + 4 >= CommandLengthLimit) || i == commands.Count - 1)
                 {
                     await RunShellCommand(currentCommand.ToString());
-                    continue;
+                    currentCommand.Clear();
                 }
-
-                // Otherwise, add an && for the next command
-                currentCommand.Append(" && ");
+                else
+                {
+                    // Otherwise, add an && for the next command
+                    currentCommand.Append(" && ");
+                }
             }
         }
 
@@ -267,11 +269,18 @@ namespace QuestPatcher.Core
             return (await ListPackages()).Where(packageId => !DefaultPackagePrefixes.Any(packageId.StartsWith)).ToList();
         }
 
-        public async Task InstallApp(string apkPath)
+        public async Task InstallApp(string apkPath, bool copyFirst)
         {
-            const string destApkPath = @"/data/local/tmp/tmp.apk";
-            await UploadFile(apkPath, destApkPath);
-            await RunCommand($"shell pm install {destApkPath}");
+            if (copyFirst)
+            {
+                const string destApkPath = @"/data/local/tmp/tmp.apk";
+                await UploadFile(apkPath, destApkPath);
+                await RunCommand($"shell pm install {destApkPath}");
+            }
+            else
+            {
+                await RunCommand($"install \"{apkPath}\"");
+            }
         }
 
         public async Task CreateDirectory(string path)
