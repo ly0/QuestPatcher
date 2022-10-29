@@ -98,7 +98,6 @@ namespace QuestPatcher
                 if (!await builder1.OpenDialogue(_mainWindow)) return;
             }
             _locker.StartOperation();
-            _mainWindow.IsEnabled = false;
 
             try
             {
@@ -109,7 +108,6 @@ namespace QuestPatcher
             finally
             {
                 _locker.FinishOperation();
-                _mainWindow.IsEnabled = true;
             }
             {
                 DialogBuilder builder1 = new()
@@ -137,13 +135,10 @@ namespace QuestPatcher
                 await builder1.OpenDialogue(_mainWindow);
             }
             _locker.StartOperation();
-            _mainWindow.IsEnabled = false;
             WebClient client = new();
             File.Delete(_specialFolders.TempFolder + "/apkToInstall.apk");
             await client.DownloadFileTaskAsync(url+"?_="+ DateTime.Now.ToFileTime(), _specialFolders.TempFolder+"/apkToInstall.apk");
             await _patchingManager.InstallApp( _specialFolders.TempFolder + "/apkToInstall.apk");
-            _locker.FinishOperation();
-            _mainWindow.IsEnabled = true;
             _locker.FinishOperation();
             {
                 DialogBuilder builder1 = new()

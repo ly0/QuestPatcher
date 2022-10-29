@@ -10,6 +10,7 @@
   </Design.DataContext>
   <DockPanel VerticalAlignment="Stretch" Margin="20 0 20 20" HorizontalAlignment="Stretch">
     <StackPanel DockPanel.Dock="Top">
+      <UserControl Width="500" Margin="0 15 0 15" VerticalAlignment="Top" Content="{Binding ProgressView}" HorizontalAlignment="Center" DockPanel.Dock="Top"/>
       <StackPanel Spacing="10">
         <TextBlock FontSize="20">便携操作</TextBlock>
         <StackPanel Orientation="Horizontal" Spacing="10">
@@ -85,7 +86,7 @@
             </StackPanel>
             <StackPanel Orientation="Horizontal" Spacing="18">
                 <TextBlock FontSize="15" VerticalAlignment="Center">选择主题:</TextBlock>
-                <ComboBox Items="{Binding ThemeManager.AvailableThemes}" MinWidth="150" SelectedItem="{Binding ThemeManager.SelectedTheme}">
+                <ComboBox Items="{Binding ThemeManager.AvailableThemes}" MinWidth="150" SelectedItem="{Binding ThemeManager.SelectedTheme}" IsEnabled="{Binding Locker.IsFree}">
                     <ComboBox.ItemTemplate>
                         <DataTemplate>
                             <TextBlock Text="{Binding Name}" />
@@ -98,6 +99,5 @@
             </StackPanel>
         </StackPanel>
     </StackPanel>
-    <UserControl Width="500" Margin="0 15 0 0" VerticalAlignment="Bottom" Content="{Binding ProgressView}" HorizontalAlignment="Center" DockPanel.Dock="Bottom"/>
   </DockPanel>
 </UserControl>

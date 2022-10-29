@@ -37,7 +37,14 @@
           <TextBlock TextAlignment="Center" FontSize="12" Foreground="Gray" >打补丁时，我们会收集游戏信息以用于后续改进，其中不包含隐私数据。</TextBlock>
           <TextBlock TextAlignment="Center" FontSize="12" Foreground="Gray" >点击开始即视为同意</TextBlock>
         </StackPanel>
-        <Button Command="{Binding StartPatching}" HorizontalContentAlignment="Center" HorizontalAlignment="Center" VerticalContentAlignment="Center" FontSize="15" Padding="12">开始打补丁！</Button>
+        <Button 
+          Command="{Binding StartPatching}" 
+          IsEnabled="{Binding Locker.IsFree}"
+          HorizontalContentAlignment="Center" 
+          HorizontalAlignment="Center" 
+          VerticalContentAlignment="Center" 
+          FontSize="15" 
+          Padding="12" >开始打补丁！</Button>
       </StackPanel>
     </DockPanel>
 
