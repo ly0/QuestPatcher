@@ -66,15 +66,15 @@
           </TextBlock>
         </StackPanel>
         <StackPanel Orientation="Horizontal" Spacing="10">
-          <ToggleButton IsChecked="{Binding Config.UseMirrorDownload}">使用镜像下载</ToggleButton>
+          <ToggleButton IsChecked="{Binding Config.UseMirrorDownload}">使用国内镜像</ToggleButton>
           <TextBlock VerticalAlignment="Center" FontSize="12">
-            使用国内镜像来加速内容下载，建议中国大陆用户打开
+            通过国内镜像来加速内容下载，建议中国大陆用户打开（蓝色代表打开）
           </TextBlock>
         </StackPanel>
         <StackPanel Orientation="Horizontal" Spacing="10">
           <ToggleButton IsChecked="{Binding Config.UseNewApkInstallMethod}">使用新方法安装APK</ToggleButton>
           <TextBlock VerticalAlignment="Center" FontSize="12">
-            切换APK安装方法，可能会解决打补丁或降级时卡死/出错。
+            切换APK安装方法，可能会解决打补丁或更换版本时卡死/出错。
           </TextBlock>
         </StackPanel>
 
