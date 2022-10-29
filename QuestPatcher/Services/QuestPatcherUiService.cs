@@ -12,6 +12,7 @@ using System.IO;
 using System.Threading.Tasks;
 using QuestPatcher.ViewModels.Modding;
 using QuestPatcher.Core;
+using QuestPatcher.Utils;
 
 namespace QuestPatcher.Services
 {
@@ -97,7 +98,7 @@ namespace QuestPatcher.Services
             }
             catch(Exception ex)
             {
-                if(ex.ToString().Contains("___flag_beatsaber_not_exists___"))
+                if (ex.ToString().Contains("___flag_beatsaber_not_exists___"))
                 {
                     DialogBuilder builder1 = new()
                     {
@@ -105,21 +106,18 @@ namespace QuestPatcher.Services
                         Text = "请先安装正版BeatSaber！",
                         HideCancelButton = true
                     };
-                    builder1.OkButton.ReturnValue = false;
-                    builder1.WithButtons(new ButtonInfo
+                    builder1.OkButton.Text = "安装APK";
+                    if (await builder1.OpenDialogue(_mainWindow) && _browseManager!= null)
                     {
-                        Text = "安装APK",
-                        OnClick = async () =>
-                        {
-                            await _browseManager.AskToInstallApk();
-                        }
-                    });
-                    await builder1.OpenDialogue(_mainWindow);
-                    ExitApplication();
+                        _browseManager?.AskToInstallApk();
+                    }
+                    else
+                    {
+                        ExitApplication();
+                    }
                     return;
                 }
-
-                if(ex.ToString().Contains("___flag_beatsaber_version_too_low___"))
+                else if (ex.ToString().Contains("___flag_beatsaber_version_too_low___"))
                 {
                     DialogBuilder builder1 = new()
                     {
@@ -128,22 +126,51 @@ namespace QuestPatcher.Services
                         "QuestPatcher只支持1.16.4及以上版本，不支持远古版本。",
                         HideCancelButton = true
                     };
-                    builder1.OkButton.ReturnValue = false;
                     builder1.WithButtons(new ButtonInfo
                     {
                         Text = "购买正版",
                         CloseDialogue = false,
-                        ReturnValue = false,
+                        OnClick = () => Util.OpenWebpage("https://www.oculus.com/experiences/quest/2448060205267927")
+                    }, new ButtonInfo
+                    {
+                        Text = "卸载当前版本",
+                        CloseDialogue = true,
                         OnClick = async () =>
                         {
-                            ProcessStartInfo psi = new()
-                            {
-                                FileName = "https://www.oculus.com/experiences/quest/2448060205267927",
-                                UseShellExecute = true
-                            };
-                            Process.Start(psi);
+                            await PatchingManager.Uninstall();
                         }
-                    }, new ButtonInfo
+                    });
+                    await builder1.OpenDialogue(_mainWindow);
+                    ExitApplication();
+                    return;
+                }
+                else if (ex.ToString().Contains("___flag_beatsaber_cracked_version___"))
+                {
+                    DialogBuilder builder1 = new()
+                    {
+                        Title = "非原版BeatSaber！",
+                        Text = "检测到已安装的BeatSaber版本可能存在异常，\n" +
+                        "你安装的游戏有可能是盗版，QuestPatcher不兼容盗版，请支持正版！",
+                        HideCancelButton = true
+                    };
+
+                    var button1 = new ButtonInfo
+                    {
+                        Text = "为何不兼容盗版？",
+                        CloseDialogue = false,
+                        ReturnValue = false,
+                        OnClick = () => Util.OpenWebpage("https://bs.wgzeyu.com/oq-guide-qp/#sbwc8866")
+                    };
+
+                    var button2 = new ButtonInfo
+                    {
+                        Text = "如何购买正版？",
+                        CloseDialogue = false,
+                        ReturnValue = false,
+                        OnClick = () => Util.OpenWebpage("https://bs.wgzeyu.com/buy/#bs_quest")
+                    };
+
+                    var button3 = new ButtonInfo
                     {
                         Text = "卸载当前版本",
                         CloseDialogue = true,
@@ -152,109 +179,24 @@ namespace QuestPatcher.Services
                         {
                             await PatchingManager.Uninstall();
                         }
-                    }
-            );
+                    };
+
+                    builder1.WithButtons(button1,button2,button3);
                     await builder1.OpenDialogue(_mainWindow);
                     ExitApplication();
                     return;
                 }
-
-
-                if(ex.ToString().Contains("___flag_beatsaber_cracked_version___"))
-                {
-                    ProcessStartInfo psi = new()
-                    {
-                        FileName = "https://bs.wgzeyu.com/oq-guide-qp/#sbwc8866",
-                        UseShellExecute = true
-                    };
-                    Process.Start(psi);
-                    ProcessStartInfo psi2 = new()
-                    {
-                        FileName = "https://bs.wgzeyu.com/buy/#bs_quest",
-                        UseShellExecute = true
-                    };
-                    Process.Start(psi2);
-                    DialogBuilder builder1 = new()
-                    {
-                        Title = "非原版BeatSaber！",
-                        Text = "检测到已安装的BeatSaber版本可能存在异常，\n" +
-                        "你安装的游戏有可能是盗版，QuestPatcher不兼容盗版，请支持正版！",
-                        HideCancelButton = true
-                    };
-                    builder1.OkButton.ReturnValue = false;
-                    builder1.WithButtons(
-                new ButtonInfo
-                {
-                    Text = "为何不兼容盗版？",
-                    CloseDialogue = false,
-                    ReturnValue = false,
-                    OnClick = async () =>
-                    {
-                        ProcessStartInfo psi = new()
-                        {
-                            FileName = "https://bs.wgzeyu.com/oq-guide-qp/#sbwc8866",
-                            UseShellExecute = true
-                        };
-                        Process.Start(psi);
-                    }
-                }, new ButtonInfo
-                {
-                    Text = "如何购买正版？",
-                    CloseDialogue = false,
-                    ReturnValue = false,
-                    OnClick = async () =>
-                    {
-                        ProcessStartInfo psi = new()
-                        {
-                            FileName = "https://bs.wgzeyu.com/buy/#bs_quest",
-                            UseShellExecute = true
-                        };
-                        Process.Start(psi);
-                    }
-                }, new ButtonInfo
-                {
-                    Text = "卸载当前版本",
-                    CloseDialogue = true,
-                    ReturnValue = true,
-                    OnClick = async () =>
-                    {
-                        await PatchingManager.Uninstall();
-                    }
-                }
-            );
-                    await builder1.OpenDialogue(_mainWindow);
-                    ExitApplication();
-                    return;
-                }
-
 
                 DialogBuilder builder = new()
                 {
-                    Title = "Unhandled Load Error",
-                    Text = "An error occured while loading",
+                    Title = "出错了！",
+                    Text = "加载的过程中出现了意料之外的错误！",
                     HideCancelButton = true
                 };
-                builder.OkButton.ReturnValue = false;
                 builder.WithException(ex);
-                builder.WithButtons(
-                    new ButtonInfo
-                    {
-                        Text = "Change App",
-                        CloseDialogue = true,
-                        ReturnValue = true,
-                        OnClick = async () =>
-                        {
-                            await OpenChangeAppMenu(true);
-                        }
-                    }
-                );
-
-                // If the user did not select to change app, or closed the dialogue, we exit due to the error
-                if(!await builder.OpenDialogue(_mainWindow))
-                {
-                    Log.Error($"Exiting QuestPatcher due to unhandled load error: {ex}");
-                    ExitApplication();
-                }
+                await builder.OpenDialogue(_mainWindow);
+                Log.Error($"Exiting QuestPatcher due to unhandled load error: {ex}");
+                ExitApplication();
             }
             finally
             {
@@ -305,7 +247,6 @@ namespace QuestPatcher.Services
             {
                 ExitApplication();
             }
-
         }
 
         public async Task Reload()

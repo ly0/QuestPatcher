@@ -574,14 +574,10 @@ namespace QuestPatcher.Core.Patching
                 throw new NullReferenceException("Cannot patch before installed app has been checked");
             }
             
-            if (_config.PatchingPermissions.FlatScreenSupport)
+            if (_config.PatchingPermissions.FlatScreenSupport && !await _prompter.PromptFlatScreenWarning())
             {
-                if (
-                    !await _prompter
-                        .PromptFlatScreenWarning()) // Disable VR requirement apparently causes infinite load
-                {
-                    return;
-                }
+                // Disable VR requirement apparently causes infinite load
+                return;
             }
 
             _patchingStage = PatchingStage.MovingToTemp;

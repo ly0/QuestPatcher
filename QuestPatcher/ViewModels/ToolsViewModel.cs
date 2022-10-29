@@ -72,9 +72,9 @@ namespace QuestPatcher.ViewModels
 
         public async void InstallServerSwitcher()
         {
-
             await _browseManager.InstallApkFromUrl("https://ganbei-hot-update-1258625969.file.myqcloud.com/questpatcher_mirror/Icey-latest.apk");
         }
+
         public async void UninstallApp()
         {
             try
@@ -108,32 +108,29 @@ namespace QuestPatcher.ViewModels
 
         public async void DeleteAllMods()
         {
+            DialogBuilder builder = new()
+            {
+                Title = "你确定要删除所有Mod吗？此操作不可恢复!",
+                Text = "删除后，你可以通过Mod管理页面的“检查核心Mod”按钮来重新安装核心Mod，\n 歌曲、模型等资源不会受到任何影响，在装好版本匹配的Mod之后即可继续使用。"
+            };
+            builder.OkButton.Text = "好的，删掉";
+            builder.CancelButton.Text = "算了，我再想想";
+            if (!await builder.OpenDialogue(_mainWindow)) return;
+            
+            Locker.StartOperation();
             try
             {
-                DialogBuilder builder = new()
-                {
-                    Title = "你确定要删除所有Mod吗？此操作不可恢复!",
-                    Text = "删除后，你可以通过Mod管理页面的“检查核心Mod”按钮来重新安装核心Mod，\n 歌曲、模型等资源不会受到任何影响，在装好版本匹配的Mod之后即可继续使用。"
-                };
-                builder.OkButton.Text = "好的，删掉";
-                builder.CancelButton.Text = "算了，我再想想";
-                if (await builder.OpenDialogue(_mainWindow))
-                {
-                    Locker.StartOperation();
-                    try
-                    {
-                        Log.Information("开始删除所有MOD！");
-                        await _modManager.DeleteAllMods();
-                    }
-                    finally
-                    {
-                        Locker.FinishOperation();
-                    }
-                }
+                Log.Information("开始删除所有MOD！");
+                await _modManager.DeleteAllMods();
             }
             catch (Exception ex)
             {
                 Log.Error(ex, "删除所有Mod竟然失败了！");
+                await _modManager.SaveMods();
+            }
+            finally
+            {
+                Locker.FinishOperation();
             }
         }
 

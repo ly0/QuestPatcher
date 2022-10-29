@@ -187,13 +187,11 @@ namespace QuestPatcher.Core
             }
         }
 
-
         public async Task MicroQuickFix(string type)
         {
-            if(type=="adb_kill_server"){
-                        await DebugBridge.KillServer();
+            if (type=="adb_kill_server") {
+                await DebugBridge.KillServer();
             }
-            
         }
 
         /// <summary>
