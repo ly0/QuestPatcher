@@ -28,7 +28,7 @@ namespace QuestPatcher.Core
         
         protected InfoDumper InfoDumper { get; }
 
-        protected Config Config => _configManager.GetOrLoadConfig();
+        public Config Config => _configManager.GetOrLoadConfig();
         
         private readonly ConfigManager _configManager;
 
@@ -127,6 +127,7 @@ namespace QuestPatcher.Core
             MigrateOldFiles();
             CoreModUtils.Instance.PackageId = Config.AppId;
             await CoreModUtils.Instance.RefreshCoreMods();
+            await Task.WhenAll(CoreModUtils.Instance.RefreshCoreMods(), DownloadMirrorUtil.Instance.Refresh());
             await PatchingManager.LoadInstalledApp();
             await ModManager.LoadModsForCurrentApp();
             HasLoaded = true;

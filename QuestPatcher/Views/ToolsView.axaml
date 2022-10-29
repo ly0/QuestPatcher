@@ -61,8 +61,19 @@
         <StackPanel Orientation="Horizontal" Spacing="10">
           <ToggleButton IsChecked="{Binding Config.PauseBeforeCompile}">在打完补丁后暂停</ToggleButton>
           <TextBlock VerticalAlignment="Center" FontSize="12">
-            在打完补丁后重新签名之前显示一个提示窗口。
-            在测试期间手动修改 APK 很有用。
+            在打完补丁后重新签名之前显示一个提示窗口。在测试期间手动修改 APK 很有用。
+          </TextBlock>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Spacing="10">
+          <ToggleButton IsChecked="{Binding Config.UseMirrorDownload}">使用镜像下载</ToggleButton>
+          <TextBlock VerticalAlignment="Center" FontSize="12">
+            使用国内镜像来加速内容下载，建议中国大陆用户打开
+          </TextBlock>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Spacing="10">
+          <ToggleButton IsChecked="{Binding Config.UseNewApkInstallMethod}">使用新方法安装APK</ToggleButton>
+          <TextBlock VerticalAlignment="Center" FontSize="12">
+            切换APK安装方法，可能会解决打补丁或降级时卡死/出错。
           </TextBlock>
         </StackPanel>
 
