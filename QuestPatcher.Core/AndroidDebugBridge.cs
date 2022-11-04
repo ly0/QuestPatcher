@@ -110,13 +110,14 @@ namespace QuestPatcher.Core
 
                 if(bridgeVersion != null && version != null)
                 {
+               
                     var bridgeVersionSplited = bridgeVersion.Trim().Split(".");
                     if(int.Parse(bridgeVersionSplited[0]) > 1 ||
                         (int.Parse(bridgeVersionSplited[0]) == 1 &&
-                        int.Parse(bridgeVersionSplited[2]) > 36))
+                        int.Parse(bridgeVersionSplited[2]) > 32))
                     {
                         _adbPath = _adbExecutableName;
-                        Log.Information("Located ADB install on PATH");
+                        Log.Information($"Located ADB install on PATH. Version: {bridgeVersion} {version}");
                     }
                     else
                     {
