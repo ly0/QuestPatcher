@@ -127,6 +127,11 @@ namespace QuestPatcher.Core
                         _adbPath = await _filesDownloader.GetFileLocation(ExternalFileType.PlatformTools);
                     }
                 }
+                else
+                {
+                    Log.Information($"Failed to detect adb version. Downloading...");
+                    _adbPath = await _filesDownloader.GetFileLocation(ExternalFileType.PlatformTools);
+                }
             }
             catch(Win32Exception) // Thrown if the file we attempted to execute does not exist (on mac & linux as well, despite saying Win32)
             {
