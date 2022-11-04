@@ -82,7 +82,9 @@ namespace QuestPatcher.Core
         {
             try
             {
+                Log.Information("Preparing adb...");
                 var output = await ProcessUtil.InvokeAndCaptureOutput(_adbExecutableName, "version");
+                Log.Information(output.AllOutput);
                 // If the ADB EXE is already on PATH, we can just use that
                 string? bridgeVersion = null, version = null;
 
@@ -97,7 +99,7 @@ namespace QuestPatcher.Core
                     }
                 }
 
-                {
+               /* {
                     string pattern = @"Version (\S+)";
 
                     Match match = Regex.Match(output.AllOutput, pattern);
@@ -106,9 +108,9 @@ namespace QuestPatcher.Core
                         Group g = match.Groups[0];
                         version = g.ToString();
                     }
-                }
+                }*/
 
-                if(bridgeVersion != null && version != null)
+                if(bridgeVersion != null/* && version != null*/)
                 {
                
                     var bridgeVersionSplited = bridgeVersion.Trim().Split(".");
