@@ -121,6 +121,7 @@ namespace QuestPatcher.Core
                     }
                     else
                     {
+                         Log.Information($"Located outdated ADB install on PATH. Version: {bridgeVersion} {version}. Downloading...");
                         _adbPath = await _filesDownloader.GetFileLocation(ExternalFileType.PlatformTools);
                     }
                 }
