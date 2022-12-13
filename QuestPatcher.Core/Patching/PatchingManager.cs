@@ -146,7 +146,7 @@ namespace QuestPatcher.Core.Patching
             int endPermissionsIdx = packageDump.IndexOf("install permissions:", StringComparison.Ordinal);
             if(beginPermissionsIdx < 0 || endPermissionsIdx < 0)
             {
-                throw new PatchingException("___flag_beatsaber_not_exists___");
+                throw new GameNotExistException("Game does not exist!");
             }
             string permissionsString = packageDump.Substring(beginPermissionsIdx, endPermissionsIdx - beginPermissionsIdx);
 
@@ -219,17 +219,27 @@ namespace QuestPatcher.Core.Patching
                    
                 if(isCracked)
                 {
-                    
-                    throw new PatchingException("___flag_beatsaber_cracked_version___");
+                    throw new GameIsCrackedException("Game is cracked!");
                 }
             }
 
             // Version Check
-            var LatestAvailableVersion = 10016004;
-            var VersionTag = version.Split('.');
-            var InstalledVersionNumber = int.Parse(VersionTag[0]) * 10000000 + int.Parse(VersionTag[1]) * 1000 + int.Parse(VersionTag[2]);
-            if(InstalledVersionNumber < LatestAvailableVersion) throw new PatchingException("___flag_beatsaber_version_too_low___");
-
+            try
+            {
+                var minimumSupportedVersion = new SemanticVersioning.Version("1.16.4");
+                var currentInstalledVersion = new SemanticVersioning.Version(version);
+                if(currentInstalledVersion < minimumSupportedVersion) throw new GameTooOldException("Game is too old!");
+            }
+            catch(GameTooOldException)
+            {
+                throw;
+            }
+            catch(Exception e)
+            {
+                Log.Logger.Error(e, "Failed to parse game version: {Version}", version);
+                var ex = new GameVersionParsingException($"Failed to parse game version: {version}", e);
+                throw ex;
+            }
 
             if (!is64Bit && !is32Bit)
             {
@@ -239,8 +249,6 @@ namespace QuestPatcher.Core.Patching
             Log.Information((isModded ? "APK is modded" : "APK is not modded") + " and is " + (is64Bit ? "64" : "32") + " bit");
 
             InstalledApp = new ApkInfo(version, isModded, is64Bit);
-
-
         }
 
         public void ResetInstalledApp()

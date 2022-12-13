@@ -12,6 +12,7 @@ using System.IO;
 using System.Threading.Tasks;
 using QuestPatcher.ViewModels.Modding;
 using QuestPatcher.Core;
+using QuestPatcher.Core.Patching;
 using QuestPatcher.Utils;
 
 namespace QuestPatcher.Services
@@ -89,6 +90,7 @@ namespace QuestPatcher.Services
             {
                 _operationLocker.StartOperation();
             }
+
             try
             {
                 await RunStartup();
@@ -96,97 +98,121 @@ namespace QuestPatcher.Services
                 // So instead, we refresh the currently selected file copy after starting, if there is one
                 _otherItemsView?.RefreshFiles();
             }
-            catch(Exception ex)
+            catch(GameNotExistException)
             {
-                if (ex.ToString().Contains("___flag_beatsaber_not_exists___"))
+                DialogBuilder builder1 = new()
                 {
-                    DialogBuilder builder1 = new()
-                    {
-                        Title = "尚未安装BeatSaber",
-                        Text = "请先安装正版BeatSaber！",
-                        HideCancelButton = true
-                    };
-                    builder1.OkButton.Text = "安装APK";
-                    if (await builder1.OpenDialogue(_mainWindow) && _browseManager!= null)
-                    {
-                        _browseManager?.AskToInstallApk();
-                    }
-                    else
+                    Title = "尚未安装BeatSaber", Text = "请先安装正版BeatSaber！", HideCancelButton = true
+                };
+                builder1.OkButton.Text = "安装APK";
+                if(await builder1.OpenDialogue(_mainWindow) && _browseManager != null)
+                {
+                    if(!await _browseManager!.AskToInstallApk())
                     {
                         ExitApplication();
                     }
-                    return;
                 }
-                else if (ex.ToString().Contains("___flag_beatsaber_version_too_low___"))
+                else
                 {
-                    DialogBuilder builder1 = new()
+                    ExitApplication();
+                }
+            }
+            catch(GameTooOldException)
+            {
+                DialogBuilder builder1 = new()
+                {
+                    Title = "旧版的BeatSaber！",
+                    Text = "已安装的BeatSaber版本过于老旧\n" +
+                           "QuestPatcher只支持1.16.4及以上版本，不支持远古版本。",
+                    HideCancelButton = true
+                };
+                builder1.WithButtons(new ButtonInfo
+                {
+                    Text = "购买正版",
+                    CloseDialogue = false,
+                    OnClick = () => Util.OpenWebpage("https://www.oculus.com/experiences/quest/2448060205267927")
+                }, new ButtonInfo
+                {
+                    Text = "卸载当前版本",
+                    CloseDialogue = true,
+                    OnClick = async () =>
                     {
-                        Title = "旧版的BeatSaber！",
-                        Text = "已安装的BeatSaber版本过于老旧\n" +
-                        "QuestPatcher只支持1.16.4及以上版本，不支持远古版本。",
-                        HideCancelButton = true
-                    };
-                    builder1.WithButtons(new ButtonInfo
+                        await PatchingManager.Uninstall();
+                    }
+                });
+                await builder1.OpenDialogue(_mainWindow);
+                ExitApplication();
+            }
+            catch(GameIsCrackedException)
+            {
+                DialogBuilder builder1 = new()
+                {
+                    Title = "非原版BeatSaber！",
+                    Text = "检测到已安装的BeatSaber版本可能存在异常，\n" +
+                           "你安装的游戏有可能是盗版，QuestPatcher不兼容盗版，请支持正版！",
+                    HideCancelButton = true
+                };
+
+                var button1 = new ButtonInfo
+                {
+                    Text = "为何不兼容盗版？",
+                    CloseDialogue = false,
+                    ReturnValue = false,
+                    OnClick = () => Util.OpenWebpage("https://bs.wgzeyu.com/oq-guide-qp/#sbwc8866")
+                };
+
+                var button2 = new ButtonInfo
+                {
+                    Text = "如何购买正版？",
+                    CloseDialogue = false,
+                    ReturnValue = false,
+                    OnClick = () => Util.OpenWebpage("https://bs.wgzeyu.com/buy/#bs_quest")
+                };
+
+                var button3 = new ButtonInfo
+                {
+                    Text = "卸载当前版本",
+                    CloseDialogue = true,
+                    ReturnValue = true,
+                    OnClick = async () =>
                     {
-                        Text = "购买正版",
-                        CloseDialogue = false,
-                        OnClick = () => Util.OpenWebpage("https://www.oculus.com/experiences/quest/2448060205267927")
-                    }, new ButtonInfo
-                    {
-                        Text = "卸载当前版本",
-                        CloseDialogue = true,
-                        OnClick = async () =>
-                        {
-                            await PatchingManager.Uninstall();
-                        }
+                        await PatchingManager.Uninstall();
+                    }
+                };
+
+                builder1.WithButtons(button1, button2, button3);
+                await builder1.OpenDialogue(_mainWindow);
+                ExitApplication();
+            }
+            catch(GameVersionParsingException)
+            {
+                DialogBuilder builder1 = new()
+                {
+                    Title = "无法识别游戏版本！",
+                    Text = "已安装的BeatSaber版本号无法识别\n请降级BeatSaber或升级QuestPatcher"
+                };
+                builder1.OkButton.Text = "更换游戏版本";
+                builder1.CancelButton.Text = "退出";
+                builder1.WithButtons(new ButtonInfo{
+                    Text = "降级教程",
+                    CloseDialogue = false,
+                    OnClick = () => Util.OpenWebpage("https://bs.wgzeyu.com/oq-guide-qp/#install_qp")
                     });
-                    await builder1.OpenDialogue(_mainWindow);
-                    ExitApplication();
-                    return;
-                }
-                else if (ex.ToString().Contains("___flag_beatsaber_cracked_version___"))
+                if(await builder1.OpenDialogue(_mainWindow) && _browseManager != null)
                 {
-                    DialogBuilder builder1 = new()
+                    _operationLocker.FinishOperation();
+                    if(!await _browseManager!.UninstallAndInstall())
                     {
-                        Title = "非原版BeatSaber！",
-                        Text = "检测到已安装的BeatSaber版本可能存在异常，\n" +
-                        "你安装的游戏有可能是盗版，QuestPatcher不兼容盗版，请支持正版！",
-                        HideCancelButton = true
-                    };
-
-                    var button1 = new ButtonInfo
-                    {
-                        Text = "为何不兼容盗版？",
-                        CloseDialogue = false,
-                        ReturnValue = false,
-                        OnClick = () => Util.OpenWebpage("https://bs.wgzeyu.com/oq-guide-qp/#sbwc8866")
-                    };
-
-                    var button2 = new ButtonInfo
-                    {
-                        Text = "如何购买正版？",
-                        CloseDialogue = false,
-                        ReturnValue = false,
-                        OnClick = () => Util.OpenWebpage("https://bs.wgzeyu.com/buy/#bs_quest")
-                    };
-
-                    var button3 = new ButtonInfo
-                    {
-                        Text = "卸载当前版本",
-                        CloseDialogue = true,
-                        ReturnValue = true,
-                        OnClick = async () =>
-                        {
-                            await PatchingManager.Uninstall();
-                        }
-                    };
-
-                    builder1.WithButtons(button1,button2,button3);
-                    await builder1.OpenDialogue(_mainWindow);
-                    ExitApplication();
-                    return;
+                        ExitApplication();
+                    }
                 }
-
+                else
+                {
+                    ExitApplication();
+                }
+            }
+            catch(Exception ex)
+            {
                 DialogBuilder builder = new()
                 {
                     Title = "出错了！",

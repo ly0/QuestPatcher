@@ -64,7 +64,7 @@ namespace QuestPatcher
                 Extensions = copyType.SupportedExtensions
             };
         }
-        public async Task AskToInstallApk(bool deleteMods = false)
+        public async Task<bool> AskToInstallApk(bool deleteMods = false)
         {
             var dialog = new OpenFileDialog
             {
@@ -75,7 +75,7 @@ namespace QuestPatcher
             filter.Name = "Beat Saber APKs";
             dialog.Filters.Add(filter);
             var files = await dialog.ShowAsync(_mainWindow);
-            if (files == null || files.Length == 0) return;
+            if (files == null || files.Length == 0) return false;
             var file = files[0] ?? "";
             if (!file.EndsWith(".apk"))
             {
@@ -86,7 +86,7 @@ namespace QuestPatcher
                     HideCancelButton = true
                 };
                 await builder1.OpenDialogue(_mainWindow);
-                return;
+                return false;
             }
 
             {
@@ -95,7 +95,7 @@ namespace QuestPatcher
                     Title = "即将开始安装",
                     Text = "安装可能需要两分钟左右，该过程中将暂时无法点击软件窗口，请耐心等待，\n点击下方“好的”按钮，即可开始安装。",
                 };
-                if (!await builder1.OpenDialogue(_mainWindow)) return;
+                if (!await builder1.OpenDialogue(_mainWindow)) return false;
             }
             _locker.StartOperation();
 
@@ -119,7 +119,7 @@ namespace QuestPatcher
                 await builder1.OpenDialogue(_mainWindow);
             }
             await _uiService.Reload();
-            
+            return true;
         }
         
         public async Task InstallApkFromUrl(string url)
@@ -152,7 +152,7 @@ namespace QuestPatcher
             }
         }
         
-        public async Task UninstallAndInstall()
+        public async Task<bool> UninstallAndInstall()
         {
             DialogBuilder builder1 = new()
             {
@@ -167,11 +167,11 @@ namespace QuestPatcher
                 OnClick = () => Util.OpenWebpage("https://bs.wgzeyu.com/drive/")
             });
             
-            if (!await builder1.OpenDialogue(_mainWindow)) return;
+            if (!await builder1.OpenDialogue(_mainWindow)) return false;
             
             try
             {
-                await AskToInstallApk(true);
+                return await AskToInstallApk(true);
             }
             catch (Exception e)
             {
@@ -183,6 +183,8 @@ namespace QuestPatcher
                 builder2.WithException(e);
                 await builder2.OpenDialogue(_mainWindow);
             }
+
+            return false;
         }
         private void AddAllCosmeticFilters(OpenFileDialog dialog)
         {
