@@ -573,6 +573,7 @@ namespace QuestPatcher
                 
                 if (missingCoreMods.Count != 0)
                 {
+                    Log.Warning("Core Mods Missing: {Mods}", missingCoreMods.Aggregate("", (s, token) => $"{s}\n{token["id"]}-{token["version"]}"));
                     DialogBuilder builder = new()
                     {
                         Title = "缺失核心Mod",

@@ -234,6 +234,11 @@ namespace QuestPatcher.Core.Patching
             {
                 throw;
             }
+            catch(ArgumentException)
+            {
+                Log.Logger.Warning("Failed to parse game version: {Version}", version);
+                Log.Logger.Warning("Assume version OK");
+            }
             catch(Exception e)
             {
                 Log.Logger.Error(e, "Failed to parse game version: {Version}", version);
