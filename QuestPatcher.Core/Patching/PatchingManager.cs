@@ -217,10 +217,10 @@ namespace QuestPatcher.Core.Patching
                 });
                 
                    
-                if(isCracked)
-                {
-                    throw new GameIsCrackedException("Game is cracked!");
-                }
+//                 if(isCracked)
+//                 {
+//                     throw new GameIsCrackedException("Game is cracked!");
+//                 }
             }
 
             // Version Check
